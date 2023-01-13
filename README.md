@@ -64,15 +64,213 @@
 
 #### 1. Averigua que privilegios de sistema hay en Postgres y como se asignan a un usuario.
 
+Postgresql utiliza roles para determinar los privilegios de sistema. Estos roles representan usuarios y pueden ser asignados a otros roles.
+
+Para realizar una correcta administración de los privilegios del sistema sobre los usuarios se aconseja agrupar los usuarios en diferentes roles siendo la diferencia principal entre los usuarios y los roles de grupo el privilegio de login que tendrían los primeros.
+Se recomienda crear grupos de usuarios a los que se les asigne diferentes privilegios, teniendo en cuenta que sólo los usuarios individuales tendrán permitido el login. 
+
+Estas opciones de configuración pueden ser aplicadas tanto durante la creación del rol como en algún momento posterior, siendo Postgresql capaz de asignar privilegios de manera dinámica a los roles ya existentes:
+```sql
+    CREATE ROLE <nombre_rol> 
+        WITH <opcion>;
+    ALTER ROLE <nombre_rol> 
+        WITH <opcion>;
+```
+Ejemplo:
+```sql
+    CREATE ROLE usuario1 
+        WITH CREATEDB 
+        LOGIN 
+        PASSWORD '1234';
+```
+![Ejercicio1](capturas/postgre-1-1.png)
+
+Algunas posibilidades, junto con sus respectivas alternativas, son:
+
+    SUPERUSER/NOSUPERUSER: se agregan los privilegios de superusuario.
+
+    CREATEDB/NOCREATEDB: opción para crear bases de datos.
+
+    CREATEROLE/NOCREATEROLE: opción para crear nuevos roles.
+
+    VALID UNTIL: indica la expiración del rol/usuario.
+
+    [ENCRYPTED] PASSWORD: asigna una contraseña al rol/usuario.
+
+    LOGIN/NOLOGIN: opción para crear sesiones.
+
+    INHERIT/NOINHERIT: opción para determinar si hereda los privilegios de los roles de los que es miembro.
+
+    REPLICATION/NOREPLICATION: opción para controlar la transmisión.
+
+    BYPASSRL/NOBYPASSRLS: opción para omitir los sistemas de seguridad de fila de las tablas.
+
+    CONNECTION LIMIT: limita el número de sesiones concurrentes.
+
+    IN ROLE: opción para indicar los roles de los que formará parte.
+
+    ADMIN: opción para indicar el rol o los roles de los formará parte con derecho a agregar a otros roles en este.
+
+
+
 #### 2. Averigua cual es la forma de asignar y revocar privilegios sobre una tabla concreta en Postgres.
+
+Para otorgar privilegios sobre una tabla en Postgres se utilizará una sintaxis particular. Esta consiste en:
+```sql
+GRANT <nombre_privilegio> 
+  ON <nombre_tabla> 
+  TO <nombre_rol | nombre_grupo_rol | PUBLIC> 
+  [WITH GRANT OPTION]
+```
+Ejemplo:
+Primero creamos la base de datos y la tabla:
+```sql
+create database db1;
+\c db1;
+create table tabla1 (id serial primary key, nombre varchar(50));
+```
+```sql
+GRANT SELECT, INSERT 
+  ON tabla1 
+  TO usuario1
+  WITH GRANT OPTION;
+```
+![Ejercicio2](capturas/postgre-2-1.png)
+
+Existen tres roles que pueden otorgar los permisos deseados: 
+- Rol superusuario: tiene todos los privilegios sobre todas las tablas.
+- Rol propietario de la tabla: tiene todos los privilegios sobre la tabla.
+- Rol que ha recibido el privilegio con la opción WITH GRANT OPTION: puede otorgar el privilegio a otros roles.
+
+La estructura para revocar privilegios en una tabla específica es:
+```sql
+REVOKE <nombre_privilegio> 
+  ON <nombre_tabla> 
+  FROM <nombre_rol | nombre_grupo_rol | PUBLIC>
+```
+Ejemplo:
+```sql
+REVOKE SELECT, INSERT 
+  ON tabla1 
+  FROM postgres;
+```
+
+Además, también se puede quitar la opción WITH GRANT OPTION de un determinado rol de usuario utilizando la orden GRANT OPTION FOR.
+
+
 
 #### 3. Averigua si existe el concepto de rol en Postgres y señala las diferencias con los roles de ORACLE.
 
+En Postgres se refiere a los usuarios como roles; a diferencia de ORACLE, donde estos pueden ser grupos de usuarios o/y otros roles. Los roles son los propietarios de las bases de datos en Postgres, y pueden tener otros roles dentro de ellos.
+
+La sintaxis para la creación de roles y la asignación de privilegios sobre los objetos es común entre los dos gestores de base de datos. Esto se hace mediante una secuencia de comandos:
+```sql
+CREATE ROLE <nombre_rol>;
+GRANT <privilegio> 
+  ON <nombre_objeto> 
+  TO <nombre_rol>;
+```
+Ejemplo:
+```sql
+CREATE ROLE usuario2;
+GRANT SELECT, INSERT 
+  ON tabla1 
+  TO usuario2;
+```
+![Ejercicio3](capturas/postgre-3-1.png)
+
+Mientras que la distribución de responsabilidades a otros roles es la misma, Postgres no da soporte a la asignación de roles a un usuario debido a que este concepto no existe.
+
+- Asignación de un rol a un usuario en ORACLE:
+```sql
+    GRANT <nombre_rol> 
+      TO <nombre_usuario>;
+```
+
+- Asignación de un rol a otro rol en ORACLE y Postgres:
+```sql
+GRANT <nombre_rol> 
+  TO <nombre_rol>;
+```
+
+Para ver los roles y los privilegios de estos en ORACLE, se debe consultar el diccionario de datos al utilizar las vistas DBA_ROLES, DBA_ROLE_PRIVS y ROLE_ROLE_PRIVS. 
+En cuanto a Postgres, se recomienda usar el comando \du+ para ver los roles y los privilegios.
+Ejemplo:
+![Ejercicio3](capturas/postgre-3-2.png)
+
 #### 4. Averigua si existe el concepto de perfil como conjunto de límites sobre el uso de recursos o sobre la contraseña en Postgres y señala las diferencias con los perfiles de ORACLE.
+
+En Postgres no hay una noción de perfil, dado que en lugar de trabajar con usuarios como en ORACLE, todas las restricciones se aplican a los objetos. 
+
+
 
 #### 5. Realiza consultas al diccionario de datos de Postgres para averiguar todos los privilegios que tiene un usuario concreto.
 
+La sintaxis para consultar todos los privilegios de un usuario en Postgres es:
+```sql
+select 'Privilegio '||PRIVILEGE_TYPE||
+       ' en la tabla '||TABLE_NAME||
+       ' del esquema '||TABLE_SCHEMA||
+       ' de la base de datos '||TABLE_CATALOG
+  from INFORMATION_SCHEMA.TABLE_PRIVILEGES 
+  where GRANTEE=<nombre_rol>;
+```
+Ejemplo 1:
+vamos a ver los usuarios que tengo:
+```sql
+select 'Privilegio '||PRIVILEGE_TYPE||
+       ' en la tabla '||TABLE_NAME||
+       ' del esquema '||TABLE_SCHEMA||
+       ' de la base de datos '||TABLE_CATALOG
+  from INFORMATION_SCHEMA.TABLE_PRIVILEGES 
+  where GRANTEE='usuario1';
+```
+![Ejercicio5](capturas/postgre-5-1.png)
+Ejemplo 2:
+```sql
+select 'Privilegio '||PRIVILEGE_TYPE||
+       ' en la tabla '||TABLE_NAME||
+       ' del esquema '||TABLE_SCHEMA||
+       ' de la base de datos '||TABLE_CATALOG
+  from INFORMATION_SCHEMA.TABLE_PRIVILEGES 
+  where GRANTEE='scott';
+```
+![Ejercicio5](capturas/postgre-5-2.png)
+
 #### 6. Realiza consultas al diccionario de datos en Postgres para averiguar qué usuarios pueden consultar una tabla concreta.
+
+La sintaxis para averiguar qué usuarios pueden consultar una tabla concreta:
+```sql
+select GRANTEE
+  from INFORMATION_SCHEMA.TABLE_PRIVILEGES
+  where TABLE_NAME = <nombre_table>
+  and PRIVILEGE_TYPE = 'SELECT';
+```
+Ejemplo 1:
+```sql
+select GRANTEE
+  from INFORMATION_SCHEMA.TABLE_PRIVILEGES
+  where TABLE_NAME = 'pg_tables'
+  and PRIVILEGE_TYPE = 'SELECT';
+```
+![Ejercicio6](capturas/postgre-6-1.png)
+
+Ejemplo 2:
+```sql
+select GRANTEE
+  from INFORMATION_SCHEMA.TABLE_PRIVILEGES
+  where TABLE_NAME = 'emp'
+  and PRIVILEGE_TYPE = 'SELECT';
+```
+![Ejercicio6](capturas/postgre-6-2.png)
+
+Ejemplo 3:
+```sql
+select GRANTEE
+  from INFORMATION_SCHEMA.TABLE_PRIVILEGES
+  where TABLE_NAME = 'tabla1'
+  and PRIVILEGE_TYPE = 'SELECT';
+```
 
 ### ORACLE:
 
