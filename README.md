@@ -123,7 +123,6 @@ GRANT <nombre_privilegio>
   [WITH GRANT OPTION]
 ```
 Ejemplo:
-Primero creamos la base de datos y la tabla:
 ```sql
 create database db1;
 \c db1;
@@ -195,6 +194,7 @@ GRANT <nombre_rol>
 
 Para ver los roles y los privilegios de estos en ORACLE, se debe consultar el diccionario de datos al utilizar las vistas DBA_ROLES, DBA_ROLE_PRIVS y ROLE_ROLE_PRIVS. 
 En cuanto a Postgres, se recomienda usar el comando \du+ para ver los roles y los privilegios.
+
 Ejemplo:
 ![Ejercicio3](capturas/postgre-3-2.png)
 
@@ -216,7 +216,6 @@ select 'Privilegio '||PRIVILEGE_TYPE||
   where GRANTEE=<nombre_rol>;
 ```
 Ejemplo 1:
-vamos a ver los usuarios que tengo:
 ```sql
 select 'Privilegio '||PRIVILEGE_TYPE||
        ' en la tabla '||TABLE_NAME||
