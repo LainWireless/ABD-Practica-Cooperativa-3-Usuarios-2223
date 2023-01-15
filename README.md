@@ -1,10 +1,10 @@
 # ABD Práctica Cooperativa 3: Usuarios 22/23
 ## PRÁCTICA TEMA 3: USUARIOS
-
+-
 ### Esta práctica ha sido realizada por Alfonso, Felipe e Iván.
-
+-
 ## Parte Individual:
-
+-
 ## Alumno 1 - Felipe (ORACLE):
 
 #### 1. Crea un rol ROLPRACTICA1 con los privilegios necesarios para conectarse a la base de datos, crear tablas y vistas e insertar datos en la tabla EMP de SCOTT.
@@ -57,11 +57,12 @@
 
 #### 25. Realiza un procedimiento llamado MostrarNumSesiones que reciba un nombre de usuario y muestre el número de sesiones concurrentes que puede tener abiertas como máximo y las que tiene abiertas realmente.
 
+---------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Alumno 2 - Iván (Postgres y ORACLE):
 
 ### Postgres:
-
+-
 #### 1. Averigua que privilegios de sistema hay en Postgres y como se asignan a un usuario.
 
 Postgresql utiliza roles para determinar los privilegios de sistema. Estos roles representan usuarios y pueden ser asignados a otros roles.
@@ -111,7 +112,7 @@ Algunas posibilidades, junto con sus respectivas alternativas, son:
 
     ADMIN: opción para indicar el rol o los roles de los formará parte con derecho a agregar a otros roles en este.
 
-
+-
 
 #### 2. Averigua cual es la forma de asignar y revocar privilegios sobre una tabla concreta en Postgres.
 
@@ -156,7 +157,7 @@ REVOKE SELECT, INSERT
 
 Además, también se puede quitar la opción WITH GRANT OPTION de un determinado rol de usuario utilizando la orden GRANT OPTION FOR.
 
-
+-
 
 #### 3. Averigua si existe el concepto de rol en Postgres y señala las diferencias con los roles de ORACLE.
 
@@ -198,11 +199,13 @@ En cuanto a Postgres, se recomienda usar el comando \du+ para ver los roles y lo
 Ejemplo:
 ![Ejercicio3](capturas/postgre-3-2.png)
 
+-
+
 #### 4. Averigua si existe el concepto de perfil como conjunto de límites sobre el uso de recursos o sobre la contraseña en Postgres y señala las diferencias con los perfiles de ORACLE.
 
 En Postgres no hay una noción de perfil, dado que en lugar de trabajar con usuarios como en ORACLE, todas las restricciones se aplican a los objetos. 
 
-
+-
 
 #### 5. Realiza consultas al diccionario de datos de Postgres para averiguar todos los privilegios que tiene un usuario concreto.
 
@@ -235,6 +238,8 @@ select 'Privilegio '||PRIVILEGE_TYPE||
   where GRANTEE='scott';
 ```
 ![Ejercicio5](capturas/postgre-5-2.png)
+
+-
 
 #### 6. Realiza consultas al diccionario de datos en Postgres para averiguar qué usuarios pueden consultar una tabla concreta.
 
@@ -272,10 +277,16 @@ select GRANTEE
 ```
 ![Ejercicio6](capturas/postgre-6-3.png)
 
+-
+
 ### ORACLE:
 
+-
+
 #### 7. Realiza una función de verificación de contraseñas que compruebe que la contraseña difiere en más de tres caracteres de la anterior y que la longitud de la misma es diferente de la anterior. Asígnala al perfil CONTRASEÑASEGURA. Comprueba que funciona correctamente.
-       
+
+-
+
 #### 8. Realiza un procedimiento llamado MostrarPrivilegiosdelRol que reciba el nombre de un rol y muestre los privilegios de sistema y los privilegios sobre objetos que lo componen.
 
 ```sql
