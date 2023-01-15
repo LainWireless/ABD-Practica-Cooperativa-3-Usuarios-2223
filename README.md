@@ -300,6 +300,123 @@ select GRANTEE
 
 #### 8. Realiza un procedimiento llamado MostrarInfoPerfil que reciba el nombre de un perfil y muestre su composición y los usuarios que lo tienen asignado.
 
+```sql
+create or replace procedure MostrarPrivilegiosRol (p_rol varchar2)
+is
+    v_validacion number:=0;
+begin
+    v_validacion:=f_ComprobarRol(p_rol);
+    if v_validacion=0 then
+        BuscarPrivilegiosSistema(p_rol);
+        dbms_output.put_line(' ');
+        dbms_output.put_line('--------------------------------------------------------------------------------');
+        dbms_output.put_line(' ');
+        BuscarPrivilegiosObjetos(p_rol);
+    end if;
+end MostrarPrivilegiosRol;
+/
+
+
+create or replace procedure BuscarPrivilegiosSistema(p_rol varchar2)
+is
+    cursor c_sys
+    is
+    select distinct privilege
+    from role_sys_privs
+    where role in (select distinct role 
+                   from role_role_privs 
+                   start with role=p_rol
+                   connect by role = prior granted_role)
+    or role = p_rol;
+    v_sys c_sys%ROWTYPE;
+begin
+    dbms_output.put_line('PRIVILEGIOS DEL SISTEMA');
+    dbms_output.put_line('--------------------------------------------------------------------------------');
+    for v_sys in c_sys loop
+        dbms_output.put_line(v_sys.privilege);
+    end loop;
+end BuscarPrivilegiosSistema;
+/
+
+
+create or replace procedure BuscarPrivilegiosObjetos(p_rol varchar2)
+is
+    cursor c_tab
+    is
+    select distinct privilege, table_name, owner
+    from role_tab_privs
+    where role in (select distinct role 
+                   from role_role_privs 
+                   start with role=p_rol
+                   connect by role = prior granted_role)
+    or role = p_rol;
+    v_tab c_tab%ROWTYPE;
+begin
+    dbms_output.put_line('PRIVILEGIOS SOBRE OBJETOS');
+    dbms_output.put_line('--------------------------------------------------------------------------------');
+    for v_tab in c_tab loop
+        dbms_output.put_line(v_tab.privilege||' sobre la tabla '||v_tab.table_name||' del usuario '||v_tab.owner);
+    end loop;
+end BuscarPrivilegiosObjetos;
+/
+
+
+create or replace function f_ComprobarRol(p_rol varchar2)
+return number
+is
+    v_resultado varchar2(30);
+begin
+    select role into v_resultado
+    from dba_roles
+    where role=p_rol;
+    return 0;
+exception
+    when NO_DATA_FOUND then
+        dbms_output.put_line('No existe el rol '||p_rol);
+        return -1;
+end f_ComprobarRol;
+/
+```
+Creación de ROL1 con privilegios sobre el sistema y sobre objetos.
+```sql
+create role ROL1;
+grant create session to ROL1;
+grant create table to ROL1;
+grant create view to ROL1;
+grant create procedure to ROL1;
+grant create trigger to ROL1;
+grant create database link to ROL1;
+grant create sequence to ROL1;
+grant create synonym to ROL1;
+grant create type to ROL1;
+grant select on scott.emp to ROL1;
+grant select on scott.dept to ROL1;
+```
+Comprobación:
+- Ejecución del procedimiento sobre un rol que no existe.
+```sql
+exec MostrarPrivilegiosRol('ROL100');
+```
+![Ejercicio8](capturas/postgre-8-1.png)
+
+- Ejecución del procedimiento sobre roles existentes.
+```sql
+exec MostrarPrivilegiosRol('ROL1');
+```
+![Ejercicio8](capturas/postgre-8-2.png)
+
+```sql
+exec MostrarPrivilegiosRol('ADM_PARALLEL_EXECUTE_TASK');
+```
+![Ejercicio8](capturas/postgre-8-3.png)
+
+```sql
+exec MostrarPrivilegiosRol('DBA');
+```
+![Ejercicio8](capturas/postgre-8-4.png)
+-
+![Ejercicio8](capturas/postgre-8-5.png)
+
 
 ## Parte Grupal:
 
