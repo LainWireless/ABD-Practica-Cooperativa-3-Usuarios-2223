@@ -1,15 +1,12 @@
 # ABD Práctica Cooperativa 3: Usuarios 22/23
 ## PRÁCTICA TEMA 3: USUARIOS
--
--
+---------------------------------------------------------------------------------------------------------------------------------------------
 ### Esta práctica ha sido realizada por Alfonso, Felipe e Iván.
--
--
+---------------------------------------------------------------------------------------------------------------------------------------------
 ## Parte Individual:
--
--
+---------------------------------------------------------------------------------------------------------------------------------------------
 ## Alumno 1 - Felipe (ORACLE):
-
+---------------------------------------------------------------------------------------------------------------------------------------------
 #### 1. Crea un rol ROLPRACTICA1 con los privilegios necesarios para conectarse a la base de datos, crear tablas y vistas e insertar datos en la tabla EMP de SCOTT.
 
 #### 2. Crea un usuario USRPRACTICA1 con el tablespace USERS por defecto y averigua que cuota se le ha asignado por defecto en el mismo. Sustitúyela por una cuota de 1M.
