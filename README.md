@@ -270,35 +270,13 @@ select GRANTEE
   where TABLE_NAME = 'tabla1'
   and PRIVILEGE_TYPE = 'SELECT';
 ```
+![Ejercicio6](capturas/postgre-6-3.png)
 
 ### ORACLE:
 
 #### 7. Realiza una función de verificación de contraseñas que compruebe que la contraseña difiere en más de tres caracteres de la anterior y que la longitud de la misma es diferente de la anterior. Asígnala al perfil CONTRASEÑASEGURA. Comprueba que funciona correctamente.
        
 #### 8. Realiza un procedimiento llamado MostrarPrivilegiosdelRol que reciba el nombre de un rol y muestre los privilegios de sistema y los privilegios sobre objetos que lo componen.
-
-## Alumno 3 - Alfonso (MySQL y ORACLE):
-
-### MySQL:
-
-#### 1. Averigua que privilegios de sistema hay en MySQL y como se asignan a un usuario.
-       
-#### 2. Averigua cual es la forma de asignar y revocar privilegios sobre una tabla concreta en MySQL.
-       
-#### 3. Averigua si existe el concepto de rol en MySQL y señala las diferencias con los roles de ORACLE.
-       
-#### 4. Averigua si existe el concepto de perfil como conjunto de límites sobre el uso de recursos o sobre la contraseña en MySQL y señala las diferencias con los perfiles de ORACLE.
-
-#### 5. Realiza consultas al diccionario de datos de MySQL para averiguar todos los privilegios que tiene un usuario concreto.
-
-#### 6. Realiza consultas al diccionario de datos en MySQL para averiguar qué usuarios pueden consultar una tabla concreta.
-
-
-### ORACLE:
-       
-#### 7. Realiza un procedimiento llamado PermisosdeAsobreB que reciba dos nombres de usuario y muestre los permisos que tiene el primero de ellos sobre objetos del segundo.
-
-#### 8. Realiza un procedimiento llamado MostrarInfoPerfil que reciba el nombre de un perfil y muestre su composición y los usuarios que lo tienen asignado.
 
 ```sql
 create or replace procedure MostrarPrivilegiosRol (p_rol varchar2)
@@ -416,6 +394,31 @@ exec MostrarPrivilegiosRol('DBA');
 ![Ejercicio8](capturas/postgre-8-4.png)
 -
 ![Ejercicio8](capturas/postgre-8-5.png)
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+## Alumno 3 - Alfonso (MySQL y ORACLE):
+
+### MySQL:
+
+#### 1. Averigua que privilegios de sistema hay en MySQL y como se asignan a un usuario.
+       
+#### 2. Averigua cual es la forma de asignar y revocar privilegios sobre una tabla concreta en MySQL.
+       
+#### 3. Averigua si existe el concepto de rol en MySQL y señala las diferencias con los roles de ORACLE.
+       
+#### 4. Averigua si existe el concepto de perfil como conjunto de límites sobre el uso de recursos o sobre la contraseña en MySQL y señala las diferencias con los perfiles de ORACLE.
+
+#### 5. Realiza consultas al diccionario de datos de MySQL para averiguar todos los privilegios que tiene un usuario concreto.
+
+#### 6. Realiza consultas al diccionario de datos en MySQL para averiguar qué usuarios pueden consultar una tabla concreta.
+
+
+### ORACLE:
+       
+#### 7. Realiza un procedimiento llamado PermisosdeAsobreB que reciba dos nombres de usuario y muestre los permisos que tiene el primero de ellos sobre objetos del segundo.
+
+#### 8. Realiza un procedimiento llamado MostrarInfoPerfil que reciba el nombre de un perfil y muestre su composición y los usuarios que lo tienen asignado.
 
 
 ## Parte Grupal:
