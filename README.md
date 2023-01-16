@@ -283,6 +283,125 @@ select GRANTEE
 
 #### 7. Realiza una función de verificación de contraseñas que compruebe que la contraseña difiere en más de tres caracteres de la anterior y que la longitud de la misma es diferente de la anterior. Asígnala al perfil CONTRASEÑASEGURA. Comprueba que funciona correctamente.
 
+```sql
+create or replace function f_verificar_passwd (p_usuario in varchar2, p_nueva_passwd in varchar2, p_vieja_passwd in varchar2)
+return boolean
+is
+    v_sumaRepe number:=0;
+    v_letraigual number:=0;
+    v_numNum number:=0;
+    v_numLetra number:=0;
+    v_validar number:=0;
+begin
+    if length(p_nueva_passwd)=length(p_vieja_passwd) then
+        raise_application_error(-20020, 'La password nueva no debe ser de la misma longitud que la anterior.');
+    end if;
+    for i in 1..length(p_nueva_passwd) loop
+        ContarNumerosYLetras(substr(p_nueva_passwd, i,1), v_numNum, v_numLetra);
+        CompararCaracteres(substr(p_nueva_passwd, i,1), p_vieja_passwd, v_letraigual);
+        if v_letraigual=0 then
+            v_sumaRepe:=v_sumaRepe+1;
+        end if;
+        v_letraigual:=0; 
+    end loop;
+    v_validar:=f_errores(v_sumaRepe, v_numNum, v_numLetra);
+    return TRUE;
+end f_verificar_passwd;
+/
+
+create or replace function f_errores(p_sumaRepe number, p_numNum number, p_numLetra number)
+return number
+is
+begin
+    case
+        when p_sumaRepe<4 then
+            raise_application_error(-20022, 'La password nueva debe ser diferente en 3 caracteres respecto a la anterior');
+        else
+            return 1;
+    end case;       
+end f_errores;
+/
+
+
+create or replace procedure CompararCaracteres(p_caracter varchar2, p_passwd varchar2, p_letraigual in out number)
+is
+begin
+    for i in 1..length(p_passwd) loop
+        if substr(p_passwd,i,1)=p_caracter then
+            p_letraigual:=1;
+        end if;
+    end loop;
+end CompararCaracteres;
+/
+
+
+create or replace procedure ContarNumerosYLetras (p_caracter varchar2, p_numero in out number, p_letra in out number)
+is
+begin
+    if p_caracter=REGEXP_REPLACE(p_caracter,'[0-9]') then
+        p_numero:=p_numero+1;
+    else
+        p_letra:=p_letra+1;
+    end if;
+end ContarNumerosYLetras;
+/
+```
+
+Creación de perfil.
+```sql
+create profile CONTRASENASEGURA limit PASSWORD_VERIFY_FUNCTION f_verificar_passwd;
+```
+![Ejercicio7](capturas/postgre-7-1.png)
+
+Creación de usuario con contraseña.
+```sql
+create user pruebapasswd identified by "123456789";
+grant connect, resource to pruebapasswd;
+```
+![Ejercicio7](capturas/postgre-7-2.png)
+
+Cambio de contraseña por una no válida antes de asignar el perfil.
+```sql
+alter user pruebapasswd identified by "123456789" replace "123456789";
+```
+![Ejercicio7](capturas/postgre-7-3.png)
+
+Asignación del perfil al usuario.
+```sql
+alter user pruebapasswd profile CONTRASENASEGURA;
+```
+![Ejercicio7](capturas/postgre-7-4.png)
+
+IMPORTANTE: Se debe loguear con el usuario pruebapasswd para que se ejecute la función de verificación de contraseñas.
+```sql
+connect pruebapasswd/123456789;
+```
+
+Cambio de contraseña por una no válida después de asignar el perfil:
+- La contraseña no es válida porque es igual a la anterior.
+```sql
+alter user pruebapasswd identified by "123456789" replace "123456789";
+```
+![Ejercicio7](capturas/postgre-7-5.png)
+
+- La contraseña no es válida porque es de la misma longitud que la anterior.
+```sql
+alter user pruebapasswd identified by "ASDFGHJKL" replace "123456789";
+```
+![Ejercicio7](capturas/postgre-7-6.png)
+
+- La contraseña no es válida porque no difiere en 3 caracteres de la anterior.
+```sql
+alter user pruebapasswd identified by "12345abc" replace "123456789";
+```
+![Ejercicio7](capturas/postgre-7-7.png)
+
+La contraseña es válida.
+```sql
+alter user pruebapasswd identified by "nuevapassword" replace "123456789";
+```
+![Ejercicio7](capturas/postgre-7-8.png)
+
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
 #### 8. Realiza un procedimiento llamado MostrarPrivilegiosdelRol que reciba el nombre de un rol y muestre los privilegios de sistema y los privilegios sobre objetos que lo componen.
