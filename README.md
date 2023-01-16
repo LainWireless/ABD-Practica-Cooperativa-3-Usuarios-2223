@@ -809,6 +809,7 @@ select 'alter user "'||username||'" default tablespace TS2;'
 ![Ejercicio 3](capturas/cs-oracle-3-2.png)
 
 - Salida:
+
 ![Ejercicio 3](capturas/cs-oracle-3-3.png)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
