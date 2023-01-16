@@ -584,15 +584,441 @@ exec MostrarPrivilegiosRol('DBA');
     • Crear objetos en cualquier tablespace.
     
     • Gestión completa de usuarios, privilegios y roles.
+    
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+#### VERSIÓN ORACLE:
+Creación el usuario becario
+```sql 
+CREATE USER becario IDENTIFIED BY becario;
+```
+Asignación de privilegios para conectarse a la base de datos
+```sql
+GRANT CREATE SESSION TO becario;
+```
+- Comprobación de inicio de sesión:
+```sql
+connect becario/becario;
+```
+![Ejercicio 1](capturas/cs-oracle-1-1.png)
+
+Modificación del número de errores en la introducción de la contraseña de cualquier usuario:
+
+- Creamos el perfil que defina los límites en este caso hasta 5 intentos:
+```sql
+CREATE PROFILE limitpass LIMIT FAILED_LOGIN_ATTEMPTS 5;
+```
+![Ejercicio 1](capturas/cs-oracle-1-2.png)
+
+- Le damos al usuario becarios la posibilidad de dar dicho perfil:
+```sql
+GRANT ALTER USER TO becario;
+alter user becario profile limitpass;
+```
+![Ejercicio 1](capturas/cs-oracle-1-3.png)
+
+- Ahora asignamos el perfil del usuario mediante ALTER USER para que use dicho perfil, en este caso el usuario becario y el usuario usuario1:
+```sql
+connect becario/becario;
+ALTER USER becario PROFILE limitpass;
+ALTER USER usuario1 PROFILE limitpass;
+```
+![Ejercicio 1](capturas/cs-oracle-1-4.png)
+
+- Comprobación de cuantos intentos de conexión tiene el usuario becario:
+![Ejercicio 1](capturas/cs-oracle-1-5.png)
+
+- Comprobación de cuantos intentos de conexión tiene el usuario usuario1:
+![Ejercicio 1](capturas/cs-oracle-1-6.png)
+
+- Vamos a hacer una consulta para ver los usuarios que tienen el perfil bloqueado:
+```sql
+SELECT USERNAME, ACCOUNT_STATUS FROM DBA_USERS WHERE USERNAME = 'BECARIO' OR USERNAME = 'USUARIO1';
+```
+![Ejercicio 1](capturas/cs-oracle-1-7.png)
+
+- Vamos a desbloquear el perfil del usuario becario:
+```sql
+ALTER USER BECARIO ACCOUNT UNLOCK;
+```
+![Ejercicio 1](capturas/cs-oracle-1-8.png)
+
+Modificación de índices en cualquier esquema (este privilegio podrá pasarlo a quien quiera):
+```sql
+GRANT ALTER ANY INDEX TO becario WITH ADMIN OPTION;
+```
+![Ejercicio 1](capturas/cs-oracle-1-9.png)
+
+- Haremos que se lo pase a otro usuario:
+```sql
+connect becario/becario;
+GRANT ALTER ANY INDEX TO usuario1;
+```
+![Ejercicio 1](capturas/cs-oracle-1-10.png)
+
+- Ver los indices:
+```sql
+SELECT INDEX_NAME, TABLE_OWNER, TABLE_NAME FROM ALL_INDEXES WHERE TABLE_OWNER = 'SCOTT';
+```
+Vemos que en la tabla emp hay un índice llamado PK_EMP y otro en la tabla dept llamado PK_DEPT.
+![Ejercicio 1](capturas/cs-oracle-1-11-1.png)
+
+- Comprobación de que el usuario becario puede modificar índices en la tabla emp:
+```sql
+connect becario/becario;
+ALTER INDEX SCOTT.PK_EMP RENAME TO PK_EMP_BECARIO;
+ALTER INDEX SCOTT.PK_EMP_BECARIO RENAME TO PK_EMP;
+```
+![Ejercicio 1](capturas/cs-oracle-1-11-2.png)
+
+- Como superusuario, comprobamos que el índice se ha renombrado:
+```sql
+SELECT INDEX_NAME, TABLE_OWNER, TABLE_NAME FROM ALL_INDEXES WHERE TABLE_OWNER = 'SCOTT';
+```
+![Ejercicio 1](capturas/cs-oracle-1-11-3.png)
+
+Insertar filas en scott.emp (este privilegio podrá pasarlo a quien quiera):
+```sql
+GRANT INSERT ON SCOTT.EMP TO becario with GRANT OPTION;
+```
+![Ejercicio 1](capturas/cs-oracle-1-12.png)
+
+- Haremos que se lo pase a otro usuario:
+```sql
+connect becario/becario;
+GRANT INSERT ON SCOTT.EMP TO usuario1;
+```
+![Ejercicio 1](capturas/cs-oracle-1-13.png)
+
+- Comprobación de que el usuario becario puede insertar en la tabla emp:
+```sql
+connect becario/becario;
+INSERT INTO SCOTT.EMP VALUES (9999, 'BECARIO', 'ANALISTA', 7839, SYSDATE, 5000, NULL, 10);
+```
+![Ejercicio 1](capturas/cs-oracle-1-14.png)
+
+- Comprobación de que el usuario usuario1 puede insertar en la tabla emp:
+```sql
+connect usuario1/usuario1;
+INSERT INTO SCOTT.EMP VALUES (9998, 'USUARIO1', 'ANALISTA', 7839, SYSDATE, 5000, NULL, 10);
+```
+![Ejercicio 1](capturas/cs-oracle-1-15.png)
+
+- Consulta de la tabla emp para comprobar que se han insertado los registros:
+```sql
+SELECT * FROM SCOTT.EMP WHERE EMPNO = 9999 OR EMPNO = 9998;
+```
+![Ejercicio 1](capturas/cs-oracle-1-16.png)
+
+Crear objetos en cualquier tablespace:
+```sql
+GRANT UNLIMITED TABLESPACE TO becario;
+GRANT CREATE ANY TABLE TO becario;
+```
+![Ejercicio 1](capturas/cs-oracle-1-17.png)
+
+- Comprobación de que el usuario becario puede crear objetos en cualquier tablespace:
+```sql
+connect becario/becario;
+CREATE TABLE BECARIO (ID NUMBER(10), NOMBRE VARCHAR2(50));
+CREATE TABLE SCOTT.BECARIO (ID NUMBER(10), NOMBRE VARCHAR2(50));
+```
+![Ejercicio 1](capturas/cs-oracle-1-18.png)
+
+Gestión completa de usuarios, privilegios y roles:
+- Gestión de usuarios:
+```sql
+GRANT CREATE USER TO becario;
+GRANT BECOME USER TO becario;
+GRANT ALTER USER TO becario;
+GRANT DROP USER TO becario;
+```
+![Ejercicio 1](capturas/cs-oracle-1-19.png)
+
+- Gestión de privilegios:
+```sql
+GRANT ALL PRIVILEGES TO becario;
+```
+![Ejercicio 1](capturas/cs-oracle-1-20.png)
+
+- Gestión de roles:
+```sql
+GRANT CREATE ROLE TO becario;
+GRANT ALTER ANY ROLE TO becario;
+GRANT DROP ANY ROLE TO becario;
+GRANT GRANT ANY ROLE TO becario;
+```
+![Ejercicio 1](capturas/cs-oracle-1-21.png)
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+#### VERSIÓN POSTGRE:
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+#### VERSIÓN MYSQL:
+
+---------------------------------------------------------------------------------------------------------------------------------------------
 
 #### 2. (ORACLE, Postgres, MySQL) Escribe una consulta que obtenga un script para quitar el privilegio de borrar registros en alguna tabla de SCOTT a los usuarios que lo tengan.
 
+#### VERSIÓN ORACLE:
+- Script:
+```sql
+select 'revoke delete on SCOTT.'||table_name||' from ' || grantee ||';'
+  from DBA_TAB_PRIVS
+  where OWNER='SCOTT'
+  and PRIVILEGE='DELETE';
+```
+- Para comprobarlo le daremos el privilegio a becario y luego ejecutaremos el script:
+```sql
+grant delete on SCOTT.DEPT to becario;
+```
+![Ejercicio 2](capturas/cs-oracle-2-1.png)
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+#### VERSIÓN POSTGRE:
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+#### VERSIÓN MYSQL:
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
 #### 3. (ORACLE) Crea un tablespace TS2 con tamaño de extensión de 256K. Realiza una consulta que genere un script que asigne ese tablespace como tablespace por defecto a los usuarios que no tienen privilegios para consultar ninguna tabla de SCOTT, excepto a SYSTEM.
+
+- Creación del tablespace:
+```sql
+create tablespace TS2 
+  datafile 'tbs_ts2.dbf' 
+  size 256k;
+```
+![Ejercicio 3](capturas/cs-oracle-3-1.png)
+
+- Script:
+```sql
+select 'alter user "'||username||'" default tablespace TS2;'
+  from DBA_USERS
+  where USERNAME!='SYSTEM'
+  and USERNAME not in (select GRANTEE 
+                         from DBA_TAB_PRIVS 
+                         where PRIVILEGE='SELECT' 
+                         and OWNER='SCOTT');
+```
+![Ejercicio 3](capturas/cs-oracle-3-2.png)
+
+- Salida:
+![Ejercicio 3](capturas/cs-oracle-3-3.png)
+
+---------------------------------------------------------------------------------------------------------------------------------------------
 
 #### 4. (ORACLE, Postgres) Realiza un procedimiento que reciba un nombre de usuario y nos muestre cuántas sesiones tiene abiertas en este momento. Además, para cada una de dichas sesiones nos mostrará la hora de comienzo y el nombre de la máquina, sistema operativo y programa desde el que fue abierta.
 
+#### VERSIÓN ORACLE:
+- Procedimiento:
+```sql
+create or replace procedure ver_excepciones(p_usuario varchar2)
+is
+	v_existe number(1):=0;
+begin
+	select count(*) into v_existe
+	from dba_users
+	where USERNAME=p_usuario;
+	if v_existe=0 then
+		raise_application_error(-20031,'El usuario que buscas no existe.');
+	end if;
+end ver_excepciones;
+/
+
+create or replace procedure ver_sesiones(p_usuario varchar2)
+is
+	cursor c_sesiones is
+	select MACHINE as maquina,to_char(LOGON_TIME,'YYYY/MM/DD HH24:MI') as comienzo,program as programa
+	from v$session 
+	where USERNAME=p_usuario;
+	v_contador number(2):=1;
+begin
+	for v_sesiones in c_sesiones loop
+		dbms_output.put_line('Sesion '||v_contador||'->');
+		dbms_output.put_line('Hora de comienzo: '||v_sesiones.comienzo);
+		dbms_output.put_line('Nombre Maquina: '||v_sesiones.maquina);
+		dbms_output.put_line('Nombre Programa: '||v_sesiones.programa);
+		v_contador:=v_contador+1;
+	end loop;
+end ver_sesiones;
+/
+
+create or replace procedure ver_sesiones_abiertas(p_usuario varchar2)
+is
+	v_sesiones_abiertas number(2):=0;
+begin
+	select count(*) into v_sesiones_abiertas
+	from v$session
+	where USERNAME=p_usuario;
+	dbms_output.put_line('Sesiones abiertas: '||v_sesiones_abiertas);
+end ver_sesiones_abiertas;
+/
+
+create or replace procedure ver_conexiones(p_usuario varchar2)
+is
+begin
+	dbms_output.put_line('Usuario: '||p_usuario);
+	ver_excepciones(p_usuario);
+	ver_sesiones_abiertas(p_usuario);
+	ver_sesiones(p_usuario);
+end ver_conexiones;
+/
+```
+Comprobaciones:
+- Usuario SCOTT (el cual no está conectado):
+```sql
+exec ver_conexiones('SCOTT');
+```
+![Ejercicio 4](capturas/cs-oracle-4-1.png)
+
+- Usuario SYS:
+```sql
+exec ver_conexiones('SYS');
+```
+![Ejercicio 4](capturas/cs-oracle-4-2.png)
+
+- Usuario Becario (para conectarnos como Becario al mismo tiempo que ejecutamos el procedimiento, abrimos una nueva ventana de SQLPlus y nos conectamos como Becario):
+```sql
+exec ver_conexiones('BECARIO');
+```
+![Ejercicio 4](capturas/cs-oracle-4-3.png)
+
+- Usuario inexiste:
+```sql
+exec ver_conexiones('inexiste');
+```
+![Ejercicio 4](capturas/cs-oracle-4-4.png)
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+#### VERSIÓN POSTGRE:
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
 #### 5. (ORACLE) Realiza un procedimiento que muestre los usuarios que pueden conceder privilegios de sistema a otros usuarios y cuales son dichos privilegios.
 
+- Procedimiento:
+```sql
+create or replace procedure ver_usuario_simple(p_rol varchar2,p_privilegio varchar2)
+is
+	cursor c_usuarios is
+	select GRANTEE
+	from dba_role_privs
+	where GRANTED_ROLE=p_rol;
+begin
+	for v_usuarios in c_usuarios loop
+		dbms_output.put_line('--------------------------------');
+		dbms_output.put_line(chr(13));
+		dbms_output.put_line('Usuario: '||v_usuarios.GRANTEE);
+		dbms_output.put_line('Privilegio: '||p_privilegio);
+		dbms_output.put_line(chr(13));
+		dbms_output.put_line('--------------------------------');
+	end loop;
+end ver_usuario_simple;
+/
+
+create or replace procedure ver_usuario_compuesto(p_rol varchar2,p_privilegio varchar2)
+is
+	cursor c_compuesto is
+	select GRANTEE
+   	from dba_role_privs
+	start with GRANTED_ROLE = p_rol
+        connect by GRANTED_ROLE = prior GRANTEE;
+	v_analizar_privilegio number(1):=0;
+begin
+	select count(*) into v_analizar_privilegio
+	from role_sys_privs
+	where ROLE=p_rol
+	and PRIVILEGE=p_privilegio;
+	if v_analizar_privilegio != 0 then
+		for v_compuesto in c_compuesto loop
+			ver_usuario_simple(v_compuesto.GRANTEE,p_privilegio);
+		end loop;
+	else
+		ver_usuario_simple(p_rol,p_privilegio);
+	end if;
+end ver_usuario_compuesto;
+/
+
+create or replace procedure privilegios_superusuario_rol
+is
+	cursor c_privs is
+	select GRANTEE,PRIVILEGE
+	from dba_sys_privs
+	where ADMIN_OPTION='YES'
+	and GRANTEE in (SELECT ROLE
+			FROM DBA_ROLES);
+	v_compuesto number(1):=0;
+	v_rol varchar2(1000):='SIMPLE';
+begin
+	for v_privs in c_privs loop
+		SELECT count(*) into v_compuesto
+		FROM DBA_ROLE_PRIVS
+		where GRANTED_ROLE=v_privs.GRANTEE;
+		if v_compuesto=0 then
+			ver_usuario_simple(v_privs.GRANTEE,v_privs.PRIVILEGE);
+		else
+			ver_usuario_compuesto(v_privs.GRANTEE,v_privs.PRIVILEGE);
+		end if;
+	end loop;
+end privilegios_superusuario_rol;
+/
+
+
+create or replace procedure privilegios_superusuario_directo
+is
+	cursor c_privsd is
+	select GRANTEE,PRIVILEGE
+	from dba_sys_privs
+	where ADMIN_OPTION='YES'
+	and GRANTEE in (SELECT USERNAME
+			FROM DBA_USERS);
+begin
+	for v_privsd in c_privsd loop
+		dbms_output.put_line('--------------------------------');
+		dbms_output.put_line(chr(13));
+		dbms_output.put_line('Usuario: '||v_privsd.GRANTEE);
+		dbms_output.put_line('Privilegio: '||v_privsd.PRIVILEGE);
+		dbms_output.put_line(chr(13));
+		dbms_output.put_line('--------------------------------');
+	end loop;
+end privilegios_superusuario_directo;
+/
+
+create or replace procedure privilegios_superusuario
+is
+begin
+	dbms_output.put_line('--------------------------------');
+	dbms_output.put_line('Usuarios que pueden dar privilegios');
+	dbms_output.put_line('--------------------------------');
+	privilegios_superusuario_directo;
+	privilegios_superusuario_rol;
+end privilegios_superusuario;
+/
+```
+- Comprobación:
+```sql
+exec privilegios_superusuario;
+```
+![Ejercicio 5](capturas/cs-oracle-5-1.png)
+-
+![Ejercicio 5](capturas/cs-oracle-5-2.png)
+-
+![Ejercicio 5](capturas/cs-oracle-5-3.png)
+-
+![Ejercicio 5](capturas/cs-oracle-5-4.png)
+-
+![Ejercicio 5](capturas/cs-oracle-5-5.png)
+-
+![Ejercicio 5](capturas/cs-oracle-5-6.png)
+
+---------------------------------------------------------------------------------------------------------------------------------------------
 
 ## EJERCICIO GRUPAL 3:
 
@@ -605,3 +1031,5 @@ exec MostrarPrivilegiosRol('DBA');
 #### c) Roles.
 
 #### d) Perfiles.
+
+---------------------------------------------------------------------------------------------------------------------------------------------
