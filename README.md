@@ -890,12 +890,14 @@ Tipos de roles
 
 
 -Roles de superusuarios
-	userAdmin
-	dbOwner
-	userAdminAnyDatabase
-	root: asigna privilegios completos sobre todos los recursos del sistema.
+
+	-userAdmin
+	-dbOwner
+	-userAdminAnyDatabase
+	-root: asigna privilegios completos sobre todos los recursos del sistema.
 
 -Roles de todas las bases de datos
+
 	-readAnyDatabase: es el mismo rol que read pero se aplica a todas las bases de datos.
 	-readWriteAnyDatabase: es el mismo rol que readWrite pero se aplica a todas las bases de datos.
 	-userAdminAnyDatabase: es el mismo rol que userAdmin pero se aplica a todas las bases de datos.
