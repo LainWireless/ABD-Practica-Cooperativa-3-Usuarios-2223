@@ -889,14 +889,14 @@ Tipos de roles
 -restore: permite restaurar los datos de las copias de seguridad.
 
 
--Roles de superusuarios
+-Roles de superusuarios:
 
 	-userAdmin
 	-dbOwner
 	-userAdminAnyDatabase
 	-root: asigna privilegios completos sobre todos los recursos del sistema.
 
--Roles de todas las bases de datos
+-Roles de todas las bases de datos:
 
 	-readAnyDatabase: es el mismo rol que read pero se aplica a todas las bases de datos.
 	-readWriteAnyDatabase: es el mismo rol que readWrite pero se aplica a todas las bases de datos.
