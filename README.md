@@ -17,7 +17,7 @@ Creación del rol y asignación de permisos.
 
 	GRANT INSERT ON SCOTT.EMP TO ROLPRACTICA1;
 ```
-![Ejercicio1](capturas/oracle-A1-1.PNG)
+![](capturas/oracle-A1-1.PNG)
 
 #### 2. Crea un usuario USRPRACTICA1 con el tablespace USERS por defecto y averigua que cuota se le ha asignado por defecto en el mismo. Sustitúyela por una cuota de 1M.
 
@@ -28,7 +28,7 @@ Creación del usuario y consulta del tablespace.
 	SELECT USERNAME,BYTES FROM DBA_TS_QUOTAS
 	WHERE USERNAME = 'USRPRACTICA1';
 ```
-![oracle-e2-1](capturas/oracle-A1-2.png)
+![](capturas/oracle-A1-2.png)
 
 Cambio de cuota y consulta del tablespace.
 ```sql
@@ -37,7 +37,7 @@ Cambio de cuota y consulta del tablespace.
     SELECT USERNAME,BYTES FROM DBA_TS_QUOTAS
 	WHERE USERNAME = 'USRPRACTICA1';
 ```
-![oracle-e2-2](capturas/oracle-A1-2-1.png)
+![](capturas/oracle-A1-2-1.png)
 
 #### 3. Modifica el usuario USRPRACTICA1 para que tenga cuota 0 en el tablespace SYSTEM.
 
@@ -45,7 +45,7 @@ Modificación de cuota en el tablespace SYSTEM.
 ```sql
     ALTER USER USRPRACTICA1 QUOTA 0 ON SYSTEM;
 ```
-![oracle-e3-1](capturas/oracle-A1-3.png)
+![](capturas/oracle-A1-3.png)
 
 #### 4. Concede a USRPRACTICA1 el ROLPRACTICA1.
 
@@ -53,7 +53,7 @@ Concesión del rol ROLPRACTICA1 al usuario USRPRACTICA1.
 ```sql
     GRANT ROLPRACTICA1 TO USRPRACTICA1;
 ```
-![oracle-e3-2](capturas/oracle-A1-4.png)
+![](capturas/oracle-A1-4.png)
 
 #### 5. Concede a USRPRACTICA1 el privilegio de crear tablas e insertar datos en el esquema de cualquier usuario. Prueba el privilegio. Comprueba si puede modificar la estructura o eliminar las tablas creadas.
 
