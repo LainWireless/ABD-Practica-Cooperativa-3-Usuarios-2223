@@ -17,7 +17,7 @@ Creación del rol y asignación de permisos.
 
 	GRANT INSERT ON SCOTT.EMP TO ROLPRACTICA1;
 ```
-![oracle-e1-1](capturas/oracle-A1-1.PNG)
+![Ejercicio1](capturas/oracle-A1-1.PNG)
 
 #### 2. Crea un usuario USRPRACTICA1 con el tablespace USERS por defecto y averigua que cuota se le ha asignado por defecto en el mismo. Sustitúyela por una cuota de 1M.
 
