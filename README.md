@@ -28,7 +28,7 @@ Creación del usuario y consulta del tablespace.
 	SELECT USERNAME,BYTES FROM DBA_TS_QUOTAS
 	WHERE USERNAME = 'USRPRACTICA1';
 ```
-![oracle-e2-1](capturas/oracle-A1-2.png)
+![oracle-e2-1](capturas/oracle-A1-2.PNG)
 
 Cambio de cuota y consulta del tablespace.
 ```sql
@@ -37,7 +37,7 @@ Cambio de cuota y consulta del tablespace.
     SELECT USERNAME,BYTES FROM DBA_TS_QUOTAS
 	WHERE USERNAME = 'USRPRACTICA1';
 ```
-![oracle-e2-2](capturas/oracle-A1-2-1.png)
+![oracle-e2-2](capturas/oracle-A1-2-1.PNG)
 
 #### 3. Modifica el usuario USRPRACTICA1 para que tenga cuota 0 en el tablespace SYSTEM.
 
@@ -45,7 +45,7 @@ Modificación de cuota en el tablespace SYSTEM.
 ```sql
     ALTER USER USRPRACTICA1 QUOTA 0 ON SYSTEM;
 ```
-![oracle-e3-1](capturas/oracle-A1-3.png)
+![oracle-e3-1](capturas/oracle-A1-3.PNG)
 
 #### 4. Concede a USRPRACTICA1 el ROLPRACTICA1.
 
@@ -53,7 +53,7 @@ Concesión del rol ROLPRACTICA1 al usuario USRPRACTICA1.
 ```sql
     GRANT ROLPRACTICA1 TO USRPRACTICA1;
 ```
-![oracle-e3-2](capturas/oracle-A1-4.png)
+![oracle-e3-2](capturas/oracle-A1-4.PNG)
 
 #### 5. Concede a USRPRACTICA1 el privilegio de crear tablas e insertar datos en el esquema de cualquier usuario. Prueba el privilegio. Comprueba si puede modificar la estructura o eliminar las tablas creadas.
 
@@ -61,7 +61,7 @@ Concesión de privilegios al usuario USRPRACTICA1.
 ```sql
     GRANT CREATE ANY TABLE, INSERT ANY TABLE TO USRPRACTICA1;
 ```
-![oracle-e5-1](capturas/oracle-A1-5.png)
+![oracle-e5-1](capturas/oracle-A1-5.PNG)
 
 Creación de tabla y registro.
 ```sql
@@ -72,7 +72,7 @@ Creación de tabla y registro.
 
     INSERT INTO SCOTT.prueba1 VALUES ('Prueba1',1);
 ```
-![oracle-e5-2](capturas/oracle-A1-5-1.png)
+![oracle-e5-2](capturas/oracle-A1-5-1.PNG)
 
 Prueba de privilegios.
 ```sql
@@ -82,7 +82,7 @@ Prueba de privilegios.
 
 	drop table SCOTT.prueba1;
 ```
-![oracle-e5-3](capturas/oracle-A1-5-2.png)
+![oracle-e5-3](capturas/oracle-A1-5-2.PNG)
 
 #### 6. Concede a USRPRACTICA1 el privilegio de leer la tabla DEPT de SCOTT con la posibilidad de que lo pase a su vez a terceros usuarios.
 
@@ -92,7 +92,7 @@ Concesión del privilegio y consulta de prueba.
 
 	select * from scott.DEPT;
 ```
-![oracle-e6-1](capturas/oracle-A1-6.png)
+![oracle-e6-1](capturas/oracle-A1-6.PNG)
 
 #### 7. Comprueba que USRPRACTICA1 puede realizar todas las operaciones previstas en el rol.
 
@@ -100,7 +100,7 @@ Conexión con el usuario usrpractica1.
 ```sql
 	connect USRPRACTICA1;
 ```
-![oracle-e7-1](capturas/oracle-A1-7.png)
+![oracle-e7-1](capturas/oracle-A1-7.PNG)
 
 Creación de tabla.
 ```sql
@@ -110,7 +110,7 @@ Creación de tabla.
 		campo2 number(8)
 	);
 ```
-![oracle-e7-2](capturas/oracle-A1-7-1.png)
+![oracle-e7-2](capturas/oracle-A1-7-1.PNG)
 
 Creación y consulta sobre la vista.
 ```sql
@@ -119,13 +119,13 @@ Creación y consulta sobre la vista.
 
 	select * from VISTAPRUEBA;
 ```
-![oracle-e7-3](capturas/oracle-A1-7-2.png)
+![oracle-e7-3](capturas/oracle-A1-7-2.PNG)
 
 Añado registro a la tabla emp de scott.
 ```sql
 	insert into scott.emp values(9501, 'Pepe', 'test', 8251, TO_DATE('16-JAN-2023', 'DD-MON-YYYY'),950, null, 20);
 ```
-![oracle-e7-4](capturas/oracle-A1-7-3.png)
+![oracle-e7-4](capturas/oracle-A1-7-3.PNG)
 
 #### 8. Quita a USRPRACTICA1 el privilegio de crear vistas. Comprueba que ya no puede hacerlo.
 
@@ -136,7 +136,7 @@ Eliminación del privilegio de crear vistas del usuario usrpractica1 y prueba de
     create VIEW vistaprueba1 AS
 	select DNAME,LOC from scott.dept;
 ```
-![oracle-e8-1](capturas/oracle-A1-8.png)
+![oracle-e8-1](capturas/oracle-A1-8.PNG)
 
 #### 9. Crea un perfil NOPARESDECURRAR que limita a dos el número de minutos de inactividad permitidos en una sesión.
 
@@ -144,7 +144,7 @@ Creación del perfil NOPARESDECURRAR.
 ```sql
 	CREATE PROFILE NOPARESDECURRAR LIMIT IDLE_TIME 2;
 ```
-![oracle-e9-1](capturas/oracle-A1-9.png)
+![oracle-e9-1](capturas/oracle-A1-9.PNG)
 
 #### 10. Activa el uso de perfiles en ORACLE.
 
@@ -152,7 +152,7 @@ Activación de perfiles en Oracle.
 ```sql
 	ALTER SYSTEM SET RESOURCE_LIMIT = TRUE;
 ```
-![oracle-e10-1](capturas/oracle-A1-10.png)
+![oracle-e10-1](capturas/oracle-A1-10.PNG)
 
 #### 11. Asigna el perfil creado a USRPRACTICA1 y comprueba su correcto funcionamiento.
 
@@ -160,7 +160,7 @@ Asignación del perfil NOPARESDECURRAR al usuario usrpractica1.
 ```sql
 	ALTER USER USRPRACTICA1 PROFILE NOPARESDECURRAR;
 ```
-![oracle-e11-1](capturas/oracle-A1-11.png)
+![oracle-e11-1](capturas/oracle-A1-11.PNG)
 
 #### 12. Crea un perfil CONTRASEÑASEGURA especificando que la contraseña caduca mensualmente y sólo se permiten tres intentos fallidos para acceder a la cuenta. En caso de superarse, la cuenta debe quedar bloqueada indefinidamente.
 
@@ -172,7 +172,7 @@ Cración del perfil CONTRASEÑASEGURA.
 		PASSWORD_REUSE_TIME UNLIMITED
 		PASSWORD_REUSE_MAX UNLIMITED;
 ```
-![oracle-e12-1](capturas/oracle-A1-12.png)
+![oracle-e12-1](capturas/oracle-A1-12.PNG)
 
 #### 13. Asigna el perfil creado a USRPRACTICA1 y comprueba su funcionamiento. Desbloquea posteriormente al usuario.
 
@@ -180,18 +180,18 @@ Asignación del perfil CONTRASEÑASEGURA al usuario usrpractica1.
 ```sql
 	ALTER USER USRPRACTICA1 PROFILE contrasenasegura;
 ```
-![oracle-e13-1](capturas/oracle-A1-13.png)
+![oracle-e13-1](capturas/oracle-A1-13.PNG)
 
 Pruebas de funcionamiento.
 ```sql
 	connect USRPRACTICA1;
 ```
-![oracle-e13-2](capturas/oracle-A1-13-1.png)
+![oracle-e13-2](capturas/oracle-A1-13-1.PNG)
 
 ```sql
 		ALTER USER USRPRACTICA1 ACCOUNT UNLOCK;
 ```
-![oracle-e13-3](capturas/oracle-A1-13-2.png)
+![oracle-e13-3](capturas/oracle-A1-13-2.PNG)
 
 #### 14. Consulta qué usuarios existen en tu base de datos.
 
@@ -199,7 +199,7 @@ Consulta de usuarios en la base de datos.
 ```sql
 	SELECT username FROM dba_users;
 ```
-![oracle-e14-1](capturas/oracle-A1-14.png)
+![oracle-e14-1](capturas/oracle-A1-14.PNG)
 
 #### 15. Elige un usuario concreto y consulta qué cuota tiene sobre cada uno de los tablespaces.
 
@@ -208,7 +208,7 @@ Cuota de usuario concreto sobre tablespaces.
 	SELECT username,tablespace_name, bytes FROM dba_ts_quotas
 	WHERE username = 'SCOTT';
 ```
-![oracle-e15-1](capturas/oracle-A1-15.png)
+![oracle-e15-1](capturas/oracle-A1-15.PNG)
 
 #### 16. Elige un usuario concreto y muestra qué privilegios de sistema tiene asignados.
 
@@ -216,7 +216,7 @@ Privilegios de sistema en usuario concreto.
 ```sql
 	SELECT * FROM DBA_SYS_PRIVS WHERE GRANTEE = 'SYS';
 ```
-![oracle-e16-1](capturas/oracle-A1-16.png)
+![oracle-e16-1](capturas/oracle-A1-16.PNG)
 
 #### 17. Elige un usuario concreto y muestra qué privilegios sobre objetos tiene asignados.
 
@@ -224,7 +224,7 @@ Privilegios sobre objetos en usuario concreto.
 ```sql
 	SELECT * FROM DBA_TAB_PRIVS WHERE GRANTEE = 'SYS';
 ```
-![oracle-e17-1](capturas/oracle-A1-17.png)
+![oracle-e17-1](capturas/oracle-A1-17.PNG)
 
 #### 18. Consulta qué roles existen en tu base de datos.
 
@@ -232,7 +232,7 @@ Roles existentes en la base de datos.
 ```sql
 	SELECT ROLE FROM DBA_ROLES;
 ```
-![oracle-e18-1](capturas/oracle-A1-18.png)
+![oracle-e18-1](capturas/oracle-A1-18.PNG)
 
 #### 19. Elige un rol concreto y consulta qué usuarios lo tienen asignado.
 
@@ -240,7 +240,7 @@ Consulta de usuarios que poseen un rol concreto.
 ```sql
 	SELECT GRANTEE FROM DBA_ROLE_PRIVS WHERE GRANTED_ROLE = 'CONNECT';
 ```
-![oracle-e19-1](capturas/oracle-A1-19.png)
+![oracle-e19-1](capturas/oracle-A1-19.PNG)
 
 #### 20. Elige un rol concreto y averigua si está compuesto por otros roles o no.
 
@@ -248,7 +248,7 @@ Consulta sobre composición de roles.
 ```sql
 	SELECT granted_role FROM dba_role_privs WHERE grantee = 'RESOURCE';
 ```
-![oracle-e20-1](capturas/oracle-A1-20.png)
+![oracle-e20-1](capturas/oracle-A1-20.PNG)
 
 #### 21. Consulta qué perfiles existen en tu base de datos.
 
@@ -256,7 +256,7 @@ Perfiles existentes en la base de datos.
 ```sql
 	SELECT RESOURCE_NAME FROM DBA_PROFILES;
 ```
-![oracle-e21-1](capturas/oracle-A1-21.png)
+![oracle-e21-1](capturas/oracle-A1-21.PNG)
 
 #### 22. Elige un perfil y consulta qué límites se establecen en el mismo.
 
@@ -264,7 +264,7 @@ Consulta limites definido en perfil.
 ```sql
 	SELECT RESOURCE_NAME, LIMIT FROM DBA_PROFILES WHERE PROFILE = 'CONTRASENASEGURA';
 ```
-![oracle-e22-1](capturas/oracle-A1-22.png)
+![oracle-e22-1](capturas/oracle-A1-22.PNG)
 
 #### 23. Muestra los nombres de los usuarios que tienen limitado el número de sesiones concurrentes.
 
@@ -276,7 +276,7 @@ Usuarios con sesiones limitadas.
 
 	SELECT username, resource_name, limit FROM dba_profiles JOIN dba_users USING (profile) WHERE resource_name = 'SESSIONS_PER_USER' AND limit != 'UNLIMITED' AND limit != 'DEFAULT';
 ```
-![oracle-e23-1](capturas/oracle-A1-23.png)
+![oracle-e23-1](capturas/oracle-A1-23.PNG)
 
 #### 24. Realiza un procedimiento que reciba un nombre de usuario y un privilegio de sistema y nos muestre el mensaje 'SI, DIRECTO' si el usuario tiene ese privilegio concedido directamente, 'SI, POR ROL' si el usuario tiene ese privilegio en alguno de los roles que tiene concedidos y un 'NO' si el usuario no tiene dicho privilegio.
 
@@ -306,7 +306,7 @@ Ejecución de procedimiento MostrarNumSesiones.
 ```sql
     execute MostrarNumSesiones('SYS');
 ```
-![oracle-e25-1](capturas/oracle-A1-25.png)
+![oracle-e25-1](capturas/oracle-A1-25.PNG)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
