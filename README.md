@@ -807,12 +807,129 @@ exec MostrarPrivilegiosRol('DBA');
 ### MongoDB:
 
 #### 1. Averigua si existe la posibilidad en MongoDB de limitar el acceso de un usuario a los datos de una colección determinada.
-       
+
+Se puede realizar mediante el uso de roles.
+
+Ejemplo:
+
+Creamos un nuevo rol con permisos de lectura solo para la colección "collection1" en la base de datos "dbprueba".
+
+```mongo
+    db.createRole({
+        role: "rol1",
+        privileges: [
+            { resource: { db: "dbprueba", collection: "collection1" }, actions: [ "find" ] }
+        ],
+        roles: []
+    })
+```
+
+Asignamos el rol a un usuario y de esta manera estaria restringido el acceso al resto de colecciones.
+
+```mongo
+    db.grantRolesToUser("prueba", [ "rol1" ])
+```
+
 #### 2. Averigua si en MongoDB existe el concepto de privilegio del sistema y muestra las diferencias más importantes con ORACLE.
+
+Oracle tiene dos tipos de privilegios para el usuario:
+
+System:
+
+	Permite al usuario realizar tareas administrativas.
+
+Object:
+
+	En este caso le permite al usuario crear algunos objetos en la base de datos, como tabla, vista, función…
+
+
+En el caso de MongoDB no tenemos esos permisos si no roles
+
+Un rol es un conjunto de privilegios.
+
+Un privilegio define una acción o acciones que se puede realizar sobre un recurso
+
+Los recursos
+
+	Bases de datos
+	Colecciones
+	Conjunto de colecciones
+	Nivel de cluster: representa operaciones sobre el conjunto de réplica o el cluster de shards
+
+Un rol puede heredar privilegios de otros roles
+
+Tipos de roles
+
+	Roles predefinidos del sistema: son los que ya se encuentran creados por el sistema
+
+	Roles definidos por el usuario: son los creados por el administrador del sistema
 
 #### 3. Explica los roles por defecto que incorpora MongoDB y como se asignan a los usuarios.
 
+-read: permite leer datos de todas las colecciones.
+
+-readWrite: permite leer y escribir datos de todas las colecciones.
+
+-dbAdmin: permite realizar tareas administrativas.
+
+-userAdmin: permite crear y modificar usuarios y roles en la base de datos actual
+
+-dbOwner: puede efectuar cualquier operación administrativa en la base de datos. Por lo tanto, junta los privilegios de readWrite, dbAdmin y userAdmin.
+
+-clusterMonitor: permite acceso de solo lectura a las herramientas de supervisión.
+
+-clusterManager: permite realizar acciones de administración y monitorización en el cluster.
+
+-hostManager: permite monitorizar y administrar servidores.
+
+-clusterAdmin: combina los tres roles anteriores, añadiendo además el rol dropDatabase.
+
+-backup: permite realizar copias de seguridad de los datos.
+
+-restore: permite restaurar los datos de las copias de seguridad.
+
+
+-Roles de superusuarios
+	userAdmin
+	dbOwner
+	userAdminAnyDatabase
+	root: asigna privilegios completos sobre todos los recursos del sistema.
+
+-Roles de todas las bases de datos
+	-readAnyDatabase: es el mismo rol que read pero se aplica a todas las bases de datos.
+	-readWriteAnyDatabase: es el mismo rol que readWrite pero se aplica a todas las bases de datos.
+	-userAdminAnyDatabase: es el mismo rol que userAdmin pero se aplica a todas las bases de datos.
+	-dbAdminAnyDatabase: es el mismo rol que dbAdmin pero se aplica a todas las bases de datos.
+
+Cuando estamos creando el usuario:
+```mongo
+db.createUser( {user: "USUARIO", pwd: "PASS", roles: [ { role: "NOMBRE DEL ROL", db: "DB" } ] })
+```
+
+Cuando ya está creado el usuario:
+```mongo
+db.grantRolesToUser( "USUARIO", [ { role : "NOMBRE DEL ROL", db : "DB" }, "NOMBRE DEL ROL", … ])
+```
+
 #### 4. Explica como puede consultarse el diccionario de datos de MongoDB para saber que roles han sido concedidos a un usuario y qué privilegios incluyen.
+
+Para poder ver los roles que tiene un usuario sobre una base de datos primero tenemos que seleccionar la base de datos.
+
+```mongo
+    use test
+```
+
+Y para consultar los roles que tiene usamos la siguiente instrucción:
+
+```mongo
+    db.getUser("nombre-usuario")
+```
+
+Para ver los privilegios que tiene un rol usamos la siguiente instrucción:
+
+```mongo
+    db.getRole("role_name")
+```
 
 ### ORACLE:
 
