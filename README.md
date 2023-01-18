@@ -2106,7 +2106,7 @@ SELECT ver_conexiones('inexiste');
 
 - Procedimiento:
 ```sql
-create or replace procedure ver_usuario_simple(p_rol varchar2,p_privilegio varchar2)
+create or replace procedure UsuarioSimple(p_rol varchar2,p_privilegio varchar2)
 is
 	cursor c_usuarios is
 	select GRANTEE
@@ -2121,10 +2121,10 @@ begin
 		dbms_output.put_line(chr(13));
 		dbms_output.put_line('--------------------------------');
 	end loop;
-end ver_usuario_simple;
+end UsuarioSimple;
 /
 
-create or replace procedure ver_usuario_compuesto(p_rol varchar2,p_privilegio varchar2)
+create or replace procedure UsuarioCompuesto(p_rol varchar2,p_privilegio varchar2)
 is
 	cursor c_compuesto is
 	select GRANTEE
@@ -2139,15 +2139,15 @@ begin
 	and PRIVILEGE=p_privilegio;
 	if v_analizar_privilegio != 0 then
 		for v_compuesto in c_compuesto loop
-			ver_usuario_simple(v_compuesto.GRANTEE,p_privilegio);
+			UsuarioSimple(v_compuesto.GRANTEE,p_privilegio);
 		end loop;
 	else
-		ver_usuario_simple(p_rol,p_privilegio);
+		UsuarioSimple(p_rol,p_privilegio);
 	end if;
-end ver_usuario_compuesto;
+end UsuarioCompuesto;
 /
 
-create or replace procedure privilegios_superusuario_rol
+create or replace procedure PrivSuperUserRol
 is
 	cursor c_privs is
 	select GRANTEE,PRIVILEGE
@@ -2163,16 +2163,16 @@ begin
 		FROM DBA_ROLE_PRIVS
 		where GRANTED_ROLE=v_privs.GRANTEE;
 		if v_compuesto=0 then
-			ver_usuario_simple(v_privs.GRANTEE,v_privs.PRIVILEGE);
+			UsuarioSimple(v_privs.GRANTEE,v_privs.PRIVILEGE);
 		else
-			ver_usuario_compuesto(v_privs.GRANTEE,v_privs.PRIVILEGE);
+			UsuarioCompuesto(v_privs.GRANTEE,v_privs.PRIVILEGE);
 		end if;
 	end loop;
-end privilegios_superusuario_rol;
+end PrivSuperUserRol;
 /
 
 
-create or replace procedure privilegios_superusuario_directo
+create or replace procedure PrivSuperUserDirecto
 is
 	cursor c_privsd is
 	select GRANTEE,PRIVILEGE
@@ -2189,7 +2189,7 @@ begin
 		dbms_output.put_line(chr(13));
 		dbms_output.put_line('--------------------------------');
 	end loop;
-end privilegios_superusuario_directo;
+end PrivSuperUserDirecto;
 /
 
 create or replace procedure privilegios_superusuario
@@ -2198,8 +2198,8 @@ begin
 	dbms_output.put_line('--------------------------------');
 	dbms_output.put_line('Usuarios que pueden dar privilegios');
 	dbms_output.put_line('--------------------------------');
-	privilegios_superusuario_directo;
-	privilegios_superusuario_rol;
+	PrivSuperUserDirecto;
+	PrivSuperUserRol;
 end privilegios_superusuario;
 /
 ```
