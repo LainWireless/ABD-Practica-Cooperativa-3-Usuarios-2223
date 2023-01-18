@@ -3,7 +3,8 @@
 
 ### Esta práctica ha sido realizada por Alfonso, Felipe e Iván.
 
-  - [Parte Individual:](#parte-individual)
+
+   - [Parte Individual:](#parte-individual)
   - [Alumno 1 - Felipe (ORACLE):](#alumno-1---felipe-oracle)
       - [1. Crea un rol ROLPRACTICA1 con los privilegios necesarios para conectarse a la base de datos, crear tablas y vistas e insertar datos en la tabla EMP de SCOTT.](#1-crea-un-rol-rolpractica1-con-los-privilegios-necesarios-para-conectarse-a-la-base-de-datos-crear-tablas-y-vistas-e-insertar-datos-en-la-tabla-emp-de-scott)
       - [2. Crea un usuario USRPRACTICA1 con el tablespace USERS por defecto y averigua que cuota se le ha asignado por defecto en el mismo. Sustitúyela por una cuota de 1M.](#2-crea-un-usuario-usrpractica1-con-el-tablespace-users-por-defecto-y-averigua-que-cuota-se-le-ha-asignado-por-defecto-en-el-mismo-sustitúyela-por-una-cuota-de-1m)
@@ -41,7 +42,6 @@
     - [ORACLE:](#oracle)
       - [7. Realiza una función de verificación de contraseñas que compruebe que la contraseña difiere en más de tres caracteres de la anterior y que la longitud de la misma es diferente de la anterior. Asígnala al perfil CONTRASEÑASEGURA. Comprueba que funciona correctamente.](#7-realiza-una-función-de-verificación-de-contraseñas-que-compruebe-que-la-contraseña-difiere-en-más-de-tres-caracteres-de-la-anterior-y-que-la-longitud-de-la-misma-es-diferente-de-la-anterior-asígnala-al-perfil-contraseñasegura-comprueba-que-funciona-correctamente)
       - [8. Realiza un procedimiento llamado MostrarPrivilegiosdelRol que reciba el nombre de un rol y muestre los privilegios de sistema y los privilegios sobre objetos que lo componen.](#8-realiza-un-procedimiento-llamado-mostrarprivilegiosdelrol-que-reciba-el-nombre-de-un-rol-y-muestre-los-privilegios-de-sistema-y-los-privilegios-sobre-objetos-que-lo-componen)
-  - [](#)
   - [Alumno 3 - Alfonso (MySQL y ORACLE):](#alumno-3---alfonso-mysql-y-oracle)
     - [MySQL:](#mysql)
       - [1. Averigua que privilegios de sistema hay en MySQL y como se asignan a un usuario.](#1-averigua-que-privilegios-de-sistema-hay-en-mysql-y-como-se-asignan-a-un-usuario)
@@ -67,7 +67,6 @@
       - [1. (ORACLE, Postgres, MySQL) Crea un usuario llamado Becario y, sin usar los roles de ORACLE, dale los siguientes privilegios: (1,5 puntos)](#1-oracle-postgres-mysql-crea-un-usuario-llamado-becario-y-sin-usar-los-roles-de-oracle-dale-los-siguientes-privilegios-15-puntos)
       - [VERSIÓN ORACLE:](#versión-oracle)
       - [VERSIÓN POSTGRE:](#versión-postgre)
-  - [](#-1)
       - [VERSIÓN MYSQL:](#versión-mysql)
       - [2. (ORACLE, Postgres, MySQL) Escribe una consulta que obtenga un script para quitar el privilegio de borrar registros en alguna tabla de SCOTT a los usuarios que lo tengan.](#2-oracle-postgres-mysql-escribe-una-consulta-que-obtenga-un-script-para-quitar-el-privilegio-de-borrar-registros-en-alguna-tabla-de-scott-a-los-usuarios-que-lo-tengan)
       - [VERSIÓN ORACLE:](#versión-oracle-1)
@@ -78,17 +77,13 @@
       - [VERSIÓN ORACLE:](#versión-oracle-2)
       - [VERSIÓN POSTGRE:](#versión-postgre-2)
       - [5. (ORACLE) Realiza un procedimiento que muestre los usuarios que pueden conceder privilegios de sistema a otros usuarios y cuales son dichos privilegios.](#5-oracle-realiza-un-procedimiento-que-muestre-los-usuarios-que-pueden-conceder-privilegios-de-sistema-a-otros-usuarios-y-cuales-son-dichos-privilegios)
-  - [](#-2)
-  - [](#-3)
-  - [](#-4)
-  - [](#-5)
-  - [](#-6)
   - [EJERCICIO GRUPAL 3:](#ejercicio-grupal-3)
     - [Elaboración de un vídeo grupal resumiendo las diferencias de concepto y en la gestión de usuarios, permisos de sistema y permisos sobre objetos, roles y perfiles entre los cuatro SGBDs estudiados. Cada miembro del grupo hablará de uno de los siguientes temas:](#elaboración-de-un-vídeo-grupal-resumiendo-las-diferencias-de-concepto-y-en-la-gestión-de-usuarios-permisos-de-sistema-y-permisos-sobre-objetos-roles-y-perfiles-entre-los-cuatro-sgbds-estudiados-cada-miembro-del-grupo-hablará-de-uno-de-los-siguientes-temas)
       - [a) Usuarios y permisos sobre objetos.](#a-usuarios-y-permisos-sobre-objetos)
       - [b) Permisos de sistema.](#b-permisos-de-sistema)
       - [c) Roles.](#c-roles)
       - [d) Perfiles.](#d-perfiles)
+      
       
 ## Parte Individual:
 
