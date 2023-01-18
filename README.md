@@ -537,6 +537,8 @@ Ejemplo:
 #### 4. Averigua si existe el concepto de perfil como conjunto de límites sobre el uso de recursos o sobre la contraseña en Postgres y señala las diferencias con los perfiles de ORACLE.
 
 En Postgres no hay una noción de perfil, dado que en lugar de trabajar con usuarios como en ORACLE, todas las restricciones se aplican a los objetos. 
+Aunque según tengo entendido la versión Enterprise si dispone de un concepto de Perfil.
+No he conseguido encontrar mucha más información relevante en Internet sobre esto.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
