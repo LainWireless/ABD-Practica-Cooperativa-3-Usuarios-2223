@@ -2156,7 +2156,6 @@ is
 	and GRANTEE in (SELECT ROLE
 			FROM DBA_ROLES);
 	v_compuesto number(1):=0;
-	v_rol varchar2(1000):='SIMPLE';
 begin
 	for v_privs in c_privs loop
 		SELECT count(*) into v_compuesto
