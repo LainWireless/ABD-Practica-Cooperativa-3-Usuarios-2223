@@ -1930,7 +1930,7 @@ select 'alter user "'||username||'" default tablespace TS2;'
 #### VERSIÓN ORACLE:
 - Procedimiento:
 ```sql
-create or replace procedure ver_excepciones(p_usuario varchar2)
+create or replace procedure ExcepcionesSesion(p_usuario varchar2)
 is
 	v_existe number(1):=0;
 begin
@@ -1940,10 +1940,10 @@ begin
 	if v_existe=0 then
 		raise_application_error(-20031,'El usuario que buscas no existe.');
 	end if;
-end ver_excepciones;
+end ExcepcionesSesion;
 /
 
-create or replace procedure ver_sesiones(p_usuario varchar2)
+create or replace procedure p_Sesiones(p_usuario varchar2)
 is
 	cursor c_sesiones is
 	select MACHINE as maquina,to_char(LOGON_TIME,'YYYY/MM/DD HH24:MI') as comienzo,program as programa
@@ -1958,10 +1958,10 @@ begin
 		dbms_output.put_line('Nombre Programa: '||v_sesiones.programa);
 		v_contador:=v_contador+1;
 	end loop;
-end ver_sesiones;
+end p_Sesiones;
 /
 
-create or replace procedure ver_sesiones_abiertas(p_usuario varchar2)
+create or replace procedure p_SesionesAbiertas(p_usuario varchar2)
 is
 	v_sesiones_abiertas number(2):=0;
 begin
@@ -1969,16 +1969,16 @@ begin
 	from v$session
 	where USERNAME=p_usuario;
 	dbms_output.put_line('Sesiones abiertas: '||v_sesiones_abiertas);
-end ver_sesiones_abiertas;
+end p_SesionesAbiertas;
 /
 
 create or replace procedure ver_conexiones(p_usuario varchar2)
 is
 begin
 	dbms_output.put_line('Usuario: '||p_usuario);
-	ver_excepciones(p_usuario);
-	ver_sesiones_abiertas(p_usuario);
-	ver_sesiones(p_usuario);
+	ExcepcionesSesion(p_usuario);
+	p_SesionesAbiertas(p_usuario);
+	p_Sesiones(p_usuario);
 end ver_conexiones;
 /
 ```
