@@ -1124,6 +1124,188 @@ GRANT GRANT ANY ROLE TO becario;
 
 #### VERSIÓN POSTGRE:
 
+Creación el usuario becario
+```sql
+CREATE USER becario WITH PASSWORD 'becario';
+```
+![Ejercicio 1](capturas/cs-postgre-1-1.png)
+
+Asignación de privilegios para conectarse a la base de datos
+```sql
+CREATE DATABASE dbbecario;
+GRANT CONNECT ON DATABASE dbbecario TO becario;
+ALTER ROLE becario WITH LOGIN;
+```
+![Ejercicio 1](capturas/cs-postgre-1-2.png)
+
+- Comprobación de inicio de sesión:
+```sql
+psql -U becario -d dbbecario
+```
+![Ejercicio 1](capturas/cs-postgre-1-3.png)
+
+Modificación del número de errores en la introducción de la contraseña de cualquier usuario:
+
+Este parámetro no está disponible en PostgreSQL por defecto. Para solucionar este problema, deberemos instalar el complemento pg_pam y configurarlo para que establezca el parámetro password_attempts_before_lockout.
+
+Para ello:
+
+1. Instalamos el complemento pg_pam
+```bash
+sudo apt-get install postgresql-contrib
+```
+2. Creamos un archivo de configuración para el complemento pg_pam
+```bash
+sudo nano /etc/postgresql/13/main/pg_pam.conf
+```
+3. Agregamos la línea siguiente al archivo de configuración:
+```bash
+password_attempts_before_lockout = 5
+```
+El fichero debe pertener al usuario postgres y al grupo postgres
+```bash
+sudo chown postgres:postgres /etc/postgresql/13/main/pg_pam.conf
+```
+4. Editamos el archivo de configuración de PostgreSQL
+```bash
+nano /etc/postgresql/13/main/postgresql.conf
+```
+5. Agregamos la siguiente línea al archivo de configuración:
+```bash
+shared_preload_libraries = 'pg_pam'
+```
+6. Reiniciamos el servicio de PostgreSQL
+```bash
+sudo service postgresql restart
+```
+Sin embargo, al tratar de iniciar sesión nos da del siguiente error:
+![Ejercicio 1](capturas/cs-postgre-1-error.png)
+
+
+- Creamos el perfil que defina los límites en este caso hasta 5 intentos:
+```sql
+CREATE ROLE limitepass     
+	WITH LOGIN
+    PASSWORD 'password'
+    VALID UNTIL 'infinity'
+    IN ROLE postgres;
+
+ALTER ROLE limitepass
+    SET password_attempts_before_lockout TO 5;
+```
+![Ejercicio 1](capturas/cs-postgre-1-4.png)
+
+- Le damos al usuario becario la posibilidad de dar dicho perfil:
+```sql
+GRANT ALTER ANY ROLE TO becario;
+```
+![Ejercicio 1](capturas/cs-postgre-1-5.png)
+
+- Ahora asignamos el perfil del usuario mediante ALTER USER para que use dicho perfil, en este caso el usuario becario y el usuario usuario1:
+```sql
+ALTER ROLE becario WITH ROLE limitepass;
+plsql -U becarrio -d dbbecario
+ALTER ROLE usuario1 WITH ROLE limitepass;
+```
+![Ejercicio 1](capturas/cs-postgre-1-6.png)
+
+- Comprobación de cuantos intentos de conexión tiene el usuario becario:
+```sql
+psql -U usuario1 -d dbbecario
+```
+![Ejercicio 1](capturas/cs-postgre-1-7.png)
+
+Modificación de índices en cualquier esquema (este privilegio podrá pasarlo a quien quiera):
+```sql
+ALTER ROLE becario WITH SUPERUSER;
+```
+![Ejercicio 1](capturas/cs-postgre-1-8.png)
+- Este rol es muy arriesgado darselo a un usuario normal, por lo que si becario es propietario de tablas, tablespaces es propietario de los índices que están en ahí.
+
+- Ejemplo:
+```sql
+ALTER INDEX scott.pk_dept RENAME TO pk_dept2;
+```
+![Ejercicio 1](capturas/cs-postgre-1-9.png)
+
+```sql
+select * from pg_indexes where tablename = 'dept';
+```
+![Ejercicio 1](capturas/cs-postgre-1-10.png)
+
+- Haremos que se lo pase a otro usuario:
+```sql
+plsql -U becario -d dbbecario
+ALTER ROLE usuario1 WITH SUPERUSER;
+```
+![Ejercicio 1](capturas/cs-postgre-1-11.png)
+
+Insertar filas en scott.emp (este privilegio podrá pasarlo a quien quiera):
+```sql
+GRANT INSERT ON scott.emp TO becario with GRANT OPTION;
+```
+![Ejercicio 1](capturas/cs-postgre-1-12.png)
+
+- Haremos que se lo pase a otro usuario:
+```sql
+plsql -U becario -d dbbecario
+GRANT INSERT ON scott.emp TO usuario1;
+```
+![Ejercicio 1](capturas/cs-postgre-1-13.png)
+
+- Comprobación:
+```sql
+plsql -U usuario1 -d dbbecario
+INSERT INTO scott.emp VALUES (7982, 'USUARIO1', 'BECARIO', 7599,TO_DATE('03-DEC-1981', 'DD-MON-YYYY'), 3000, NULL, 20);
+select * from scott.emp where empno = 7982;
+```
+![Ejercicio 1](capturas/cs-postgre-1-14.png)
+-
+![Ejercicio 1](capturas/cs-postgre-1-15.png)
+
+
+Crear objetos en cualquier tablespace:
+- Creamos una carpeta para el tablespace:
+```bash
+mkdir /var/lib/postgresql/13/main/dbbecario
+```
+- Creamos un tablespace:
+```sql
+CREATE TABLESPACE dbbecario LOCATION '/var/lib/postgresql/13/main/dbbecario';
+```
+![Ejercicio 1](capturas/cs-postgre-1-17.png)
+- En postgresql tenemos que indicar el nombre del tablespace en concreto, si no tiene el role de superuser:
+```sql
+GRANT CREATE ON TABLESPACE dbbecario TO becario;
+```
+![Ejercicio 1](capturas/cs-postgre-1-16.png)
+
+- Probamos a crear una tabla:
+```sql
+CREATE TABLE becario (id int, nombre varchar(20));
+```
+![Ejercicio 1](capturas/cs-postgre-1-18.png)
+
+- Comprobamos que se ha creado en el tablespace:
+```sql
+\d becario;
+```
+![Ejercicio 1](capturas/cs-postgre-1-19.png)
+
+
+Gestión completa de usuarios, privilegios y roles:
+- Gestión de usuarios y privilegios:
+```sql
+ALTER ROLE becario WITH SUPERUSER;
+```
+![Ejercicio 1](capturas/cs-postgre-1-20.png)
+
+- Gestión de roles:
+```sql
+ALTER ROLE becario WITH CREATEROLE;
+```
+![Ejercicio 1](capturas/cs-postgre-1-21.png)
+
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
 #### VERSIÓN MYSQL:
@@ -1149,6 +1331,19 @@ grant delete on SCOTT.DEPT to becario;
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
 #### VERSIÓN POSTGRE:
+- Script:
+```sql
+select 'Revoke Delete on '||table_catalog||'.'||table_name||' from '||grantee||';'
+from information_schema.role_table_grants
+where table_catalog='scott'
+and privilege_type='DELETE'
+and table_schema='scott';
+```
+- Para comprobarlo le daremos el privilegio a becario y luego ejecutaremos el script:
+```sql
+grant delete on scott.dept to becario;
+```
+![Ejercicio 2](capturas/cs-postgre-2-1.png)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1269,6 +1464,100 @@ exec ver_conexiones('inexiste');
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
 #### VERSIÓN POSTGRE:
+
+- Procedimiento:
+```sql
+CREATE OR REPLACE FUNCTION ver_excepciones(p_usuario VARCHAR)
+RETURNS VARCHAR
+AS $$
+DECLARE
+    v_existe INTEGER := 0;
+BEGIN
+    SELECT COUNT(*) INTO v_existe
+    FROM pg_user
+    WHERE usename = p_usuario;
+
+    IF v_existe = 0 THEN
+        RAISE EXCEPTION 'El usuario que buscas no existe.';
+    END IF;
+
+    RETURN 'OK';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION ver_sesiones(p_usuario VARCHAR)
+RETURNS VARCHAR
+AS $$
+DECLARE
+    v_contador INTEGER := 1;
+BEGIN
+    FOR v_sesiones IN SELECT * FROM pg_stat_activity WHERE usename = p_usuario LOOP
+        RAISE NOTICE 'Sesion % ->', v_contador;
+        RAISE NOTICE 'Hora de comienzo: %', v_sesiones.query_start;
+        RAISE NOTICE 'Nombre Maquina: %', v_sesiones.client_addr;
+        RAISE NOTICE 'Nombre Programa: %', v_sesiones.application_name;
+        v_contador := v_contador + 1;
+    END LOOP;
+    
+    RETURN 'OK';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION ver_sesiones_abiertas(p_usuario VARCHAR)
+RETURNS VARCHAR
+AS $$
+DECLARE
+    v_sesiones_abiertas INTEGER := 0;
+BEGIN
+    SELECT COUNT(*) INTO v_sesiones_abiertas
+    FROM pg_stat_activity
+    WHERE usename = p_usuario;
+    RAISE NOTICE 'Sesiones abiertas: %', v_sesiones_abiertas;
+    RETURN 'OK';
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION ver_conexiones(p_usuario VARCHAR)
+RETURNS VARCHAR
+AS $$
+DECLARE
+  v_excepcion VARCHAR;
+BEGIN
+  RAISE NOTICE 'Usuario: %', p_usuario;
+  v_excepcion := ver_excepciones(p_usuario);
+  IF v_excepcion = 'OK' THEN
+    PERFORM ver_sesiones_abiertas(p_usuario);
+    PERFORM ver_sesiones(p_usuario);
+  END IF;
+  RETURN 'OK';
+END;
+$$ LANGUAGE PLPGSQL;
+```
+Comprobaciones:
+- Usuario SCOTT (el cual no está conectado):
+```sql
+SELECT ver_conexiones('SCOTT');
+```
+![Ejercicio 4](capturas/cs-postgre-4-1.png)
+
+- Usuario Postgres:
+```sql
+SELECT ver_conexiones('postgres');
+```
+![Ejercicio 4](capturas/cs-postgre-4-2.png)
+
+- Usuario Becario (para conectarnos como Becario al mismo tiempo que ejecutamos el procedimiento, abrimos una nueva ventana de SQLPlus y nos conectamos como Becario):
+```sql
+SELECT ver_conexiones('becario');
+```
+![Ejercicio 4](capturas/cs-postgre-4-3.png)
+
+- Usuario inexiste:
+```sql
+SELECT ver_conexiones('inexiste');
+```
+![Ejercicio 4](capturas/cs-postgre-4-4.png)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
