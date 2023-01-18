@@ -1455,7 +1455,7 @@ exec ver_conexiones('BECARIO');
 ```
 ![Ejercicio 4](capturas/cs-oracle-4-3.png)
 
-- Usuario inexiste:
+- Usuario inexistente:
 ```sql
 exec ver_conexiones('inexiste');
 ```
@@ -1490,11 +1490,12 @@ RETURNS VARCHAR
 AS $$
 DECLARE
     v_contador INTEGER := 1;
+    v_sesiones RECORD;
 BEGIN
     FOR v_sesiones IN SELECT * FROM pg_stat_activity WHERE usename = p_usuario LOOP
         RAISE NOTICE 'Sesion % ->', v_contador;
-        RAISE NOTICE 'Hora de comienzo: %', v_sesiones.query_start;
-        RAISE NOTICE 'Nombre Maquina: %', v_sesiones.client_addr;
+        RAISE NOTICE 'Hora de comienzo: %', v_sesiones.backend_start;
+        RAISE NOTICE 'Nombre Base de Datos: %', v_sesiones.datname;
         RAISE NOTICE 'Nombre Programa: %', v_sesiones.application_name;
         v_contador := v_contador + 1;
     END LOOP;
@@ -1535,9 +1536,9 @@ END;
 $$ LANGUAGE PLPGSQL;
 ```
 Comprobaciones:
-- Usuario SCOTT (el cual no está conectado):
+- Usuario becario (el cual no está conectado):
 ```sql
-SELECT ver_conexiones('SCOTT');
+SELECT ver_conexiones('becario');
 ```
 ![Ejercicio 4](capturas/cs-postgre-4-1.png)
 
@@ -1547,17 +1548,11 @@ SELECT ver_conexiones('postgres');
 ```
 ![Ejercicio 4](capturas/cs-postgre-4-2.png)
 
-- Usuario Becario (para conectarnos como Becario al mismo tiempo que ejecutamos el procedimiento, abrimos una nueva ventana de SQLPlus y nos conectamos como Becario):
-```sql
-SELECT ver_conexiones('becario');
-```
-![Ejercicio 4](capturas/cs-postgre-4-3.png)
-
-- Usuario inexiste:
+- Usuario inexistente:
 ```sql
 SELECT ver_conexiones('inexiste');
 ```
-![Ejercicio 4](capturas/cs-postgre-4-4.png)
+![Ejercicio 4](capturas/cs-postgre-4-3.png)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
