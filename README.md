@@ -863,24 +863,295 @@ exec MostrarPrivilegiosRol('DBA');
 ### MySQL:
 
 #### 1. Averigua que privilegios de sistema hay en MySQL y como se asignan a un usuario.
-       
+
+- Para listar los usuarios y comprobar desde donde tienen permitida la conexión, realizaremos la siguiente consulta:
+```sql
+select user,host from mysql.user;
+```
+![Ejercicio 1](capturas/mysql-1-1.png)
+
+La columna host nos indicará desde donde tiene permitido el usuario conectarse.
+- Con la orden “show privileges” podremos comprobar los privilegios del sistema:
+```sql
+show privileges;
+```
+![Ejercicio 1](capturas/mysql-1-2.png)
+
+- Si queremos asignar los permisos para realizar ciertas acciones a un un usuario, utilizamos la siguiente sentencia:
+```sql
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, TRIGGER
+    -> ON nombre_bd.*
+    -> TO 'nombre_usuario'@'localhost';
+```
+
+- Si queremos un usuario con permisos de administrador (Todos los permisos sobre todas las tablas), usamos:
+```sql
+GRANT ALL PRIVILEGES ON *.* TO 'nombre_usuario'@'localhost';
+```
+
 #### 2. Averigua cual es la forma de asignar y revocar privilegios sobre una tabla concreta en MySQL.
        
+Para asignar privilegios utilizamos “GRANT” y para revocarlos “REVOKE”, de la siguiente forma:
+Ejemplo 1:
+- Asignamos (GRANT) el privilegio SELECT sobre la base de datos “2asir” en la tabla “Profesor” al usuario “alfonso”, en la máquina “localhost”:
+```sql
+GRANT PRIVILEGIO ON nombre_bd.nombre_tabla FROM ‘usuario’@'maquina';
+```
+![Ejercicio 2](capturas/mysql-2-1.png)
+
+Ejemplo 2: 
+- Revocamos (REVOKE) el privilegio UPDATE y DELETE sobre todas las tablas de todas las bases de datos al usuario “usuario”, en la máquina “localhost”:
+```sql
+REVOKE PRIVILEGIO1,PRIVILEGIO2 ON *.* FROM 'usuario'@'maquina';
+```
+![Ejercicio 2](capturas/mysql-2-2.png)
+
+Siendo *.* todas las tablas de todas las bases de datos.
+
 #### 3. Averigua si existe el concepto de rol en MySQL y señala las diferencias con los roles de ORACLE.
        
+Los roles son grupos a los que se asignan determinados privilegios. En lugar de asignar privilegios a cada usuario individualmente, podemos crear roles que tendrán estos privilegios y luego asignar el rol en cuestión a los usuarios. También podemos asignar un rol a otro rol.
+
+Tras investigar un poco, he podido comprobar como el concepto de rol, no existe actualmente en MySQL.
+
+ROLES EN ORACLE
+
+Para crear un rol en Oracle usamos la sentencia:
+```sql
+CREATE ROLE nombre_rol;
+```
+
+Para mayor seguridad podemos asignar una clave (contraseña) al rol, de la siguiente forma:
+```sql
+SET ROLE nombre_rol IDENTIFIED BY contraseña;
+```
+
+Para asignar el rol a un usuario usamos:
+```sql
+GRANT nombre_rol TO usuario;
+```
+
+A los roles, también podemos asignarle privilegios a nivel de objetos. De esta forma, por ejemplo, podemos permitir únicamente realizar consultas e inserciones.
+```sql
+CREATE ROLE consulta_inserciones;
+GRANT SELECT,INSERT on usuario.tabla to consulta_inserciones;
+```
+
+Finalmente este rol con el “perfil” que hemos definido, a los distintos usuarios finales:
+```sql
+GRANT consulta_inserciones TO alfonso;
+```
+
+**Nota:** Existen algunos roles predefinidos, algunos de ellos son:
+
+    CONNECT 
+    CREATE SESSION 
+    CREATE TABLE
+    CREATE VIEW
+    CREATE SYNONYM
+    CREATE SEQUENCE
+    CREATE DATABASE LINK
+    CREATE CLUSTER
+    ALTER SESSION
+    RESOURCE
+    CREATE PROCEDURE
+    CREATE SEQUENCE
+    CREATE TRIGGER
+    CREATE TYPE
+    CREATE CLUSTER
+    CREATE INDEXTYPE
+    CREATE OPERATOR SCHEDULER
+    CREATE ANY JOB
+    CREATE JOB
+    EXECUTE ANY CLASS
+    EXECUTE ANY PROGRAM
+    MANAGE SCHEDULER
+
+
+En Oracle, podemos encontrar 2 roles, los que es muy conveniente conocer su funcionalidad:
+
+- DBA: Aporta la mayoría de los privilegios. No es recomendable asignarlo a usuarios que no son administradores.
+
+- SELECT_CATALOG_ROLE: No aporta privilegios de sistema, pero tiene cerca de 1600 privilegios de objeto.
+
+Para ver los roles definidos y los privilegios que se otorgan a través de ellos, consultamos las siguientes vistas:
+```sql
+select * from DBA_ROLES;
+select * from DBA_ROLE_PRIVS order by GRANTEE;
+```
+
 #### 4. Averigua si existe el concepto de perfil como conjunto de límites sobre el uso de recursos o sobre la contraseña en MySQL y señala las diferencias con los perfiles de ORACLE.
+
+MySQL:
+
+Tras investigar, he podido comprobar como en MySQL sí existe el concepto de "perfil de usuario" el cual es un conjunto de límites que se aplican a un usuario específico en cuanto al uso de recursos y a la contraseña. Estos límites pueden incluir cosas como el número máximo de consultas por hora, el número máximo de conexiones simultáneas, y la fuerza de la contraseña.
+
+Desde la versión 8 de MySQL se permite aplicar límites para cuentas individuales en el uso de los siguientes recursos del servidor:
+
+    - El número de consultas que puede ejecutar una cuenta por hora.
+    - El número de actualizaciones que puede ejecutar una cuenta de usuario por hora.
+    - El número de veces que una cuenta de usuario puede conectarse al servidor por hora.
+    - El número de conexiones simultáneas al servidor por una cuenta.
+
+Una “cuenta” en este contexto corresponde a una fila en la tabla del sistema mysql.user. Es decir, una conexión se evalúa con los valores de Usuario y Host en la fila de la tabla de usuario que se aplica a la conexión.
+
+Para establecer límites de recursos para una cuenta en el momento de la creación de la cuenta usamos CREATE USER. Para modificar los límites de recursos de una cuenta existente, usamos ALTER USER.
+
+Por ejemplo, si queremos modificar los recursos de una cuenta de limitando el número de consultas por hora, podemos usar la siguiente sentencia:
+```sql
+ALTER USER ‘alfonso’@’localhost’ WITH MAX_QUERIES_PER_HOUR 100;
+```
+
+Si queremos eliminar este límite, establecemos el valor a 0.
+```sql
+ALTER USER ‘alfonso’@’localhost’ WITH MAX_QUERIES_PER_HOUR 0;
+```
+
+En cuanto a la contraseña contamos con las siguientes limitaciones:
+    • Caducidad de la contraseña (así se cambian periódicamente)
+    • Restricciones de reutilización de contraseñas.
+    • Verificación de contraseña.
+    • Usar dos contraseñas (contraseñas duales, primaria y secundaria)
+    • Evaluación de la fuerza de la contraseña
+    • Permite generar contraseñas aleatorias.
+    • Habilitar el bloqueo temporal de la cuenta a partir de x errores mediante el parámetro ‘validate_password’.
+
+ORACLE:
+
+En Oracle, también existe el concepto de "perfil de usuario", pero se refiere a un conjunto de opciones de seguridad y recursos que se pueden asignar a un usuario específico. Estos pueden incluir límites en cuanto al tiempo de inactividad, el número máximo de sesiones, y los recursos de CPU y memoria.
+Un ejemplo de creación de un perfil podría ser:
+   create profile nombreLimite Limit
+   sessions_per_user 2
+   connect_time 5
+   idle_time 3
+   failed_login_attempts 2;
+
+Los recursos que limitamos son recursos del kernel: uso de la CPU, duración de sesión, etc.
+Y también limites de uso de las claves de acceso (passwords): duración, intentos de acceso, reuso, etc. 
+
+Algunas de las opciones de “CREATE PROFILE” o “ALTER PROFILE” son:
+
+    • CONNECT_TIME: Límite para el tiempo de conexión permitido para una sesión. Este limite se establece en minutos.
+
+    • IDLE. TIME: Limite para el tiempo de inactividad permitido para una sesión. Este límite se establece en minutos.
+
+    • SESSIONS_PER_USER: Límite para el número de sesiones activas permitidas para un usuario.
+
+    • CPU_PER_SESSION: Límite para el uso de CPU permitido para una sesión. Este limite se establece en segundos.
+
+    • CPU_PER_CALL: Límite para el uso de CPU permitido para una llamada a un procedimiento almacenado. Este limite se establece en segundos.
+
+    • LOGICAL_READS_PER_SESSION: Limite para el número de lecturas lógicas permitidas para una sesión.
+
+    • LOGICAL_READS_PER_CALL: Límite para el número de lecturas lógicas permitidas para una llamada a un procedimiento almacenado.
+
+    • PRIVATE_SGA: Límite para el uso de memoria en el área de trabajo privada (SGA) permitido para una sesión. Este limite se establece en bytes.
+
+Por ejemplo, para limitar el tiempo de inactividad en una sesión (En 30 minutos):
+```sql
+ALTER PROFILE default LIMIT IDLE_TIME  30;
+```
+
+En resumen, los perfiles de MySQL y Oracle son similares en el sentido de que ambos se utilizan para establecer límites y restricciones para los usuarios, pero los detalles específicos de lo que se puede limitar pueden variar entre los dos sistemas.
+
 
 #### 5. Realiza consultas al diccionario de datos de MySQL para averiguar todos los privilegios que tiene un usuario concreto.
 
+Si ejecutamos la sentencia “SHOW GRANTS;” veremos los privilegios del usuario actual.
+```sql
+SHOW GRANTS;
+```
+![Ejercicio 5](capturas/mysql-5-1.png)
+
+
+**Nota:** Para ver con que usuario estamos conectados usamos:
+```sql
+SELECT CURRENT_USER();
+```
+![Ejercicio 5](capturas/mysql-5-2.png)
+
+Para comprobar los privilegios de un usuario en concreto usamos:
+```sql
+SHOW GRANTS FOR ‘Usuario’;
+```
+![Ejercicio 5](capturas/mysql-5-3.png)
+
+
 #### 6. Realiza consultas al diccionario de datos en MySQL para averiguar qué usuarios pueden consultar una tabla concreta.
+
+Para ello debemos de realizar una consulta combinada de la tablas mysql.db y mysql.tables_priv. La tabla mysql.db contiene información sobre los privilegios a nivel de base de datos. En cambio la tabla mysql.tables_priv contiene información sobre los privilegios de nivel de tabla.
+
+Ambas se puede consultar y, aunque es posible actualizarlas directamente, es mejor usar GRANT para establecer privilegios.
+
+Para comprobar los distintos tipos de datos que podemos consultar usaremos:
+```sql
+describe mysql.db;
+```
+![Ejercicio 6](capturas/mysql-6-1.png)
+
+```sql
+desc mysql.tables_priv;
+```
+![Ejercicio 6](capturas/mysql-6-2.png)
+
+A continuación realizaremos la siguiente consulta para averiguar los usuarios que pueden consultar una tabla concreta:
+```sql
+select t.user, d.host from mysql.tables_priv t, mysql.db d where table_name='Profesor' and t.user=d.user and select_priv='Y';
+```
+
+Como vemos en el campo table_name seleccionamos la tabla y como queremos comprobar los usuarios que puedan “consultar” dicha tabla, establecemos el campo select_priv en “Y”.
 
 
 ### ORACLE:
        
 #### 7. Realiza un procedimiento llamado PermisosdeAsobreB que reciba dos nombres de usuario y muestre los permisos que tiene el primero de ellos sobre objetos del segundo.
 
+
+**NO REALIZADO**
+
+
 #### 8. Realiza un procedimiento llamado MostrarInfoPerfil que reciba el nombre de un perfil y muestre su composición y los usuarios que lo tienen asignado.
 
+- Procedimiento principal
+```sql
+create or replace procedure MostrarInfoPerfil (p_perfil VARCHAR2)
+is
+begin
+MostrarComposicionPerfil(p_perfil);
+MostrarUsuariosPerfil(p_perfil);
+end;
+/
+```
+
+- Procedimientos dependientes (Compilar antes del procedimiento principal)
+```sql
+create or replace procedure MostrarComposicionPerfil(p_perfil VARCHAR2)
+is
+cursor c_composicion is
+select resource_name from dba_profiles where profile = p_perfil;
+begin
+dbms_output.put_line(chr(10)||'Composicion del perfil: '||chr(10));
+for recurso in c_composicion loop
+dbms_output.put_line(' - '|| recurso.resource_name);
+end loop;
+end;
+/
+
+create or replace procedure MostrarUsuariosPerfil (p_perfil VARCHAR2)
+is
+cursor c_usuarios is
+select username from dba_users where profile = p_perfil;
+begin
+dbms_output.put_line(chr(10)||'Usuarios asignados al perfil: '||chr(10));
+for usuario in c_usuarios loop
+dbms_output.put_line(' - ' || usuario.username);
+end loop;
+end;
+/
+```
+
+- Comprobación:
+![Ejercicio 8](capturas/mysql-8-1.png)
 
 ## Parte Grupal:
 
@@ -1019,7 +1290,33 @@ Para ver los privilegios que tiene un rol usamos la siguiente instrucción:
 
 #### 5. Realiza un procedimiento llamado MostrarObjetosAccesibles que reciba un nombre de usuario y muestre todos los objetos a los que tiene acceso.
 
+En este caso realizaré el procedimiento de forma que te muestre el objeto, junto con el tipo de objeto. Además para estructurarlo ordenadamente, lo ordenaré por tipo de objeto.
+```sql
+CREATE OR REPLACE PROCEDURE MostrarObjetosAccesibles (p_usuario VARCHAR2)
+IS
+CURSOR c_objetos IS
+SELECT object_name, object_type from sys.dba_objects where owner=upper(p_usuario) order by object_type;
+v_objeto c_objetos%rowtype;
+BEGIN
+dbms_output.put_line('Lista de objetos del usuario '||p_usuario||chr(10));
+open c_objetos;
+fetch c_objetos into v_objeto;
+while c_objetos%found and c_objetos%rowcount>0 loop
+dbms_output.put_line('Objeto: '||v_objeto.object_name||chr(10)||'Tipo: '||v_objeto.object_type||chr(10));
+fetch c_objetos into v_objeto;
+end loop;
+if c_objetos%rowcount<=0 then
+raise_application_error(-20001,'No existen objetos accesibles para el usuario '||p_usuario);
+end if;
+END;
+/
+```
+
 #### 6. Realiza un procedimiento que reciba un nombre de usuario, un privilegio y un objeto y nos muestre el mensaje 'SI, DIRECTO' si el usuario tiene ese privilegio sobre objeto concedido directamente, 'SI, POR ROL' si el usuario lo tiene en alguno de los roles que tiene concedidos y un 'NO' si el usuario no tiene dicho privilegio.
+
+
+**NO REALIZADO**
+
 
 ## CASO PRÁCTICO 1:
 
@@ -1392,6 +1689,150 @@ ALTER ROLE becario WITH CREATEROLE;
 
 #### VERSIÓN MYSQL:
 
+- Creación del usuario becario:
+![Ejercicio 1](capturas/cs-mysql-1-1.png)
+
+
+#Asignación de privilegios (totales) para conectarse a la base de datos;
+![Ejercicio 1](capturas/cs-mysql-1-2.png)
+
+- Modificación del número de errores en la introducción de la contraseña de cualquier usuario:
+
+En MySQL, para modificar el número de intentos fallidos permitidos antes de bloquear una cuenta de usuario, se debe modificar el valor de la variable del sistema "max_failed_logins". El valor por defecto es 6.
+Para cambiar el valor de esta variable, se puede utilizar la siguiente sentencia SQL:
+```sql
+SET GLOBAL max_failed_logins = valor;
+```
+
+Reemplazamos valor con el nuevo valor deseado. Este cambio es temporal y se aplica solo a la sesión actual. 
+
+Si se quiere que el cambio sea permanente, debería modificar el archivo de configuración de MySQL (my.cnf), añadiendo la siguiente línea en la sección [mysqld] y posteriormente reiniciar el servidor.
+```bash
+max_failed_logins = valor
+```
+
+**Nota:** En este caso, al estar utilizando mariadb, la ruta del fichero de configuración será:
+```bash
+/etc/mysql/mariadb.conf.d/50-mysqld_safe.cnf
+```
+![Ejercicio 1](capturas/cs-mysql-1-3.png)
+
+      
+      
+- Modificar índices en cualquier esquema (este privilegio podrá pasarlo a quien quiera):
+
+Los índices en MySQL se utilizan para mejorar el rendimiento de las consultas de selección, actualización y eliminación que utilizan cláusulas WHERE. Si una tabla no tiene un índice en la columna utilizada en una cláusula WHERE, MySQL debe examinar cada fila de la tabla para verificar si cumple con la condición. Con un índice en esa columna, MySQL puede buscar rápidamente la información deseada en el índice en lugar de examinar cada fila de la tabla.
+
+
+En MySQL, no existe “ALTER INDEX”, aunque podemos utilizar:
+
+- Crear index: 
+```sql
+CREATE INDEX
+```
+
+- Eliminar index: 
+```sql
+DROP INDEX
+```      
+
+- Renombrar index: 
+```sql
+ALTER TABLE tabla RENAME INDEX nombre_antiguo_indice TO nombre_nuevo_indice;
+```
+
+- Para eliminar un index específico de una tabla: 
+```sql
+ALTER TABLE tabla DROP INDEX nombre_indice;
+```      
+
+- Para añadir un índice específico de una tabla con sentencia “ALTER TABLE”:
+```sql
+ALTER TABLE tabla ADD INDEX nombre_indice_nuevo(campo);
+```
+
+- Para añadir un índice específico de una tabla con sentencia CREATE INDEX:
+```sql
+create index indice on tabla(columna);
+```
+![Ejercicio 1](capturas/cs-mysql-1-4.png)
+
+- Para mostrar los index:
+```sql
+show indexes from tabla;
+```
+![Ejercicio 1](capturas/cs-mysql-1-5.png)
+
+Además de agregar un índice normal, también se puede agregar un índice UNIQUE, que garantiza que los valores en las columnas incluidas en el índice son únicos:
+```sql
+ALTER TABLE nombre_de_tabla ADD UNIQUE nombre_índice (campo1, campo2, ...);
+```
+
+También se puede agregar un índice FULLTEXT, que se utiliza para buscar palabras o frases en una o varias columnas de tipo texto:
+```sql
+ALTER TABLE nombre_de_tabla ADD FULLTEXT nombre_índice (campo1, campo2, ...);
+```
+
+Para asignar este privilegio usamos:
+![Ejercicio 1](capturas/cs-mysql-1-6.png)
+
+- Insertar filas en scott.emp (este privilegio podrá pasarlo a quien quiera)
+
+He añadido el esquema scott a mi escenario.
+![Ejercicio 1](capturas/cs-mysql-1-7.png)
+
+
+Ahora vamos a darle el privilegio de inserción de datos al usuario “becario”. Para ello utilizamos la siguiente sentencia:
+```sql
+GRANT INSERT ON dept to 'becario'@'localhost' IDENTIFIED BY "becario" WITH GRANT OPTION;
+```
+![Ejercicio 1](capturas/cs-mysql-1-8.png)
+
+Para comprobarlo, vamos a loguearnos con el usuario becario. Posteriormente realizamos una prueba de inserción y una consulta:
+![Ejercicio 1](capturas/cs-mysql-1-9.png)
+
+Como podemos comprobar podemos insertar datos pero no podemos consultar datos ya que no tenemos concedido ese privilegio.
+
+
+- Crear objetos en cualquier tablespace.
+
+Antes que nadas debemos de analizar los 2 tipos de tablespace que existen en MySQL:
+
+1. Los tablespaces de sistema: son aquellos que vienen incluidos por defecto en una instalación de MySQL. Como por ejemplo el tablespace "mysql" que almacena las tablas de sistema de MySQL, y el tablespace "information_schema" que almacena la información de metadatos de las tablas.
+   
+2. Los tablespaces de usuario: son los tablespaces creados por un usuario para almacenar tablas y índices personalizados. El usuario tiene control completo sobre estos tablespaces, incluyendo la capacidad de crear, eliminar, modificar y asignar tablas y índices a ellos.
+En este caso, no vamos a enfocar en los tablespaces de usuario.
+
+De la misma forma que hemos visto anteriormente con los índices, concediendo el permiso CREATE al usuario, ya le permitiremos crear objetos en cualquier tablespace.
+```sql
+GRANT CREATE ON *.* TO 'becario'@'localhost';
+```
+
+Para modificar cualquier tablespace y así crear o eliminar objetos usamos la siguiente sintaxis:
+```sql
+ALTER TABLESPACE nombre_tablespace {ADD | DROP} DATAFILE 'nombre_archivo';
+```
+
+Si en cambio queremos crear un nuevo tablespace, usamos:
+```sql
+CREATE TABLESPACE `nuevo_tablespace` ADD DATAFILE 'nuevo_tablespace.ibd'
+```
+
+Como vemos, se crea un archivo con extensión .ibd bajo el mismo directorio donde está el tablespace general (/var/lib/mysql/). Podemos especificar una ruta absoluta:
+```sql
+CREATE TABLESPACE `nuevo_tablespace` ADD DATAFILE '/home/ubuntu/nuevo_tablespace.ibd'
+```
+
+- Gestión completa de usuarios, privilegios y roles.
+
+Para darle a un usuario todos los permisos necesarios para la gestión completa de usuarios, privilegios y roles debemos de convertirlo en administrador, para ello le damos todos los privilegios, de la siguiente forma:
+```sql
+GRANT ALL PRIVILEGES ON *.* TO ‘becario’@’localhost’ WITH GRANT OPTION;
+```
+![Ejercicio 1](capturas/cs-mysql-1-10.png)
+
+
+
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
 #### 2. (ORACLE, Postgres, MySQL) Escribe una consulta que obtenga un script para quitar el privilegio de borrar registros en alguna tabla de SCOTT a los usuarios que lo tengan.
@@ -1430,6 +1871,23 @@ grant delete on scott.dept to becario;
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
 #### VERSIÓN MYSQL:
+
+- Script:
+```sql
+select concat('Revoke Delete on ',table_schema,'.',table_name,' from ',grantee,';') as script
+from information_schema.table_privileges
+where table_schema='scott'
+and privilege_type='DELETE';
+```
+
+Para realizar la comprobación, le he dado el privilegio DELETE sobre la tabla dept al usuario becario:
+```sql
+GRANT DELETE ON dept to 'becario'@'localhost' IDENTIFIED BY "becario" WITH GRANT OPTION;
+```
+![Ejercicio 1](capturas/cs-mysql-2-1.png)
+
+Ahora sí, ejecutamos la consulta anterior para obtener el script.
+![Ejercicio 1](capturas/cs-mysql-2-2.png)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
