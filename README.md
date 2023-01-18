@@ -1312,6 +1312,12 @@ END;
 /
 ```
 
+- Comprobación con una ejecución correcta:
+![Ejercicio 5](capturas/ejecucion-correcta.png)
+
+- Comprobación con una ejecución incorrecta:
+![Ejercicio 5](capturas/ejecucion-erronea.png)
+
 #### 6. Realiza un procedimiento que reciba un nombre de usuario, un privilegio y un objeto y nos muestre el mensaje 'SI, DIRECTO' si el usuario tiene ese privilegio sobre objeto concedido directamente, 'SI, POR ROL' si el usuario lo tiene en alguno de los roles que tiene concedidos y un 'NO' si el usuario no tiene dicho privilegio.
 
 
